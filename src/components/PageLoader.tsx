@@ -21,7 +21,7 @@ export default function PageLoader() {
     const fallback = setTimeout(dismiss, 12000);
 
     function waitForVideos() {
-      const videos = Array.from(document.querySelectorAll<HTMLVideoElement>("video"));
+      const videos = Array.from(document.querySelectorAll<HTMLVideoElement>("video[data-loader-wait]"));
 
       if (videos.length === 0) {
         dismiss();

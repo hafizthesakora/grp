@@ -15,6 +15,7 @@ export default function HeroSection() {
         muted
         loop
         playsInline
+        data-loader-wait
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source src="/videos/hero.mp4" type="video/mp4" />

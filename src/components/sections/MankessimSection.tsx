@@ -48,20 +48,17 @@ export default function MankessimSection() {
   const [muted, setMuted] = useState(true);
   const [userToggled, setUserToggled] = useState(false);
 
-  // Auto-unmute when section enters view, mute when it leaves
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (userToggled) return; // user manually chose mute state — don't override
         if (entry.isIntersecting) {
-          video.muted = false;
-          setMuted(false);
+          if (video.paused) video.play().catch(() => {});
+          if (!userToggled) { video.muted = false; setMuted(false); }
         } else {
-          video.muted = true;
-          setMuted(true);
+          if (!userToggled) { video.muted = true; setMuted(true); }
         }
       },
       { threshold: 0.3 }
@@ -116,6 +113,7 @@ export default function MankessimSection() {
                   loop
                   playsInline
                   muted
+                  preload="auto"
                   className="w-full h-full object-cover"
                 >
                   <source src="/videos/mankessim.mp4" type="video/mp4" />
