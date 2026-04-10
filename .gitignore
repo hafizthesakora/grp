@@ -43,7 +43,6 @@ next-env.d.ts
 # Claude Code
 .claude/
 
-# Large video files — host separately (Google Drive / CDN)
-public/videos/*.mp4
+# Large video files — host separately if over 100MB
 public/videos/*.mov
 public/videos/*.webm

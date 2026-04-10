@@ -118,7 +118,7 @@ export default function MankessimSection() {
                   muted
                   className="w-full h-full object-cover"
                 >
-                  <source src="https://archive.org/download/1000686217/GOLDEN%20ROOTS.mp4" type="video/mp4" />
+                  <source src="/videos/mankessim.mp4" type="video/mp4" />
                 </video>
 
                 {/* Mute / unmute button */}

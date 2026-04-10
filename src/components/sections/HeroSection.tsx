@@ -17,7 +17,7 @@ export default function HeroSection() {
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
-        <source src="https://archive.org/download/1000686217/1000686217.mp4" type="video/mp4" />
+        <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
 
       {/* Gradient overlay — matches Figma: lighter top-right, dark bottom-left */}
