@@ -56,9 +56,6 @@ export default function MankessimSection() {
       ([entry]) => {
         if (entry.isIntersecting) {
           if (video.paused) video.play().catch(() => {});
-          if (!userToggled) { video.muted = false; setMuted(false); }
-        } else {
-          if (!userToggled) { video.muted = true; setMuted(true); }
         }
       },
       { threshold: 0.3 }
