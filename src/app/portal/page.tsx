@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, MessageSquare } from "lucide-react";
 
 export default function PortalLoginPage() {
   const [email, setEmail] = useState("");
@@ -11,18 +11,29 @@ export default function PortalLoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    setTimeout(() => {
-      if (email === "demo@goldenroots.com" && password === "demo123") {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem("grp_session", JSON.stringify(data.user));
         window.location.href = "/portal/dashboard";
       } else {
-        setError("Invalid credentials. Use the demo credentials below.");
+        const data = await res.json();
+        setError(data.error ?? "Invalid email or password.");
         setLoading(false);
       }
-    }, 800);
+    } catch {
+      setError("Network error. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -104,15 +115,15 @@ export default function PortalLoginPage() {
             </button>
           </form>
 
-          {/* Demo hint */}
+          {/* Help block */}
           <div className="mt-6 bg-white/5 border border-white/10 p-5">
-            <p className="text-white/70 font-bold text-sm mb-2">Demo Credentials</p>
-            <p className="text-white/40 text-xs mb-1">Email: <span className="text-white/70">demo@goldenroots.com</span></p>
-            <p className="text-white/40 text-xs mb-3">Password: <span className="text-white/70">demo123</span></p>
-            <button onClick={() => { setEmail("demo@goldenroots.com"); setPassword("demo123"); }}
-                    className="text-gold-400 hover:text-gold-300 text-xs font-bold underline">
-              Auto-fill →
-            </button>
+            <p className="text-white/50 text-sm mb-3">
+              Portal access is provided by our team after your purchase is confirmed.
+            </p>
+            <a href="https://wa.me/12482108333" target="_blank" rel="noopener noreferrer"
+               className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 text-sm font-bold transition-colors">
+              <MessageSquare className="w-4 h-4" /> Contact us on WhatsApp
+            </a>
           </div>
 
           <p className="text-white/30 text-xs text-center mt-6">

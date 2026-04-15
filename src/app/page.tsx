@@ -7,6 +7,7 @@ import DifferenceSection from "@/components/sections/DifferenceSection";
 import LocationSection from "@/components/sections/LocationSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import MankessimSection from "@/components/sections/MankessimSection";
+import MontageSection from "@/components/sections/MontageSection";
 import HomeCTA from "@/components/sections/HomeCTA";
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
         <PropertiesPreview />
         <DifferenceSection />
         <MankessimSection />
+        <MontageSection />
         <LocationSection />
         <TestimonialsSection />
         <HomeCTA />

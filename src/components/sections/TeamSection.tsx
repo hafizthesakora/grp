@@ -1,27 +1,29 @@
+import Image from "next/image";
+
 const team = [
   {
     name: "Fareeda Anderson",
     role: "Founder & CEO",
-    initials: "FA",
     bio: "Visionary leader driving the mission to provide accessible, transparent land ownership for the African diaspora.",
-    color: "bg-gold-400",
-    textColor: "text-green-950",
+    photo: "/team/fareeda.jpg",
   },
   {
     name: "Mercy Buabeng",
     role: "Director of Operations",
-    initials: "MB",
     bio: "Oversees all operational processes ensuring every transaction meets the highest standards of due diligence.",
-    color: "bg-green-700",
-    textColor: "text-white",
+    photo: "/team/mercy.jpg",
   },
   {
     name: "Prudence Borbin",
     role: "Head of Diaspora Relations",
-    initials: "PB",
     bio: "Dedicated to building lasting relationships with diaspora clients across North America, Europe, and beyond.",
-    color: "bg-green-800",
-    textColor: "text-white",
+    photo: "/team/prudence.jpg",
+  },
+  {
+    name: "Hafiz Toyyib",
+    role: "Chief Innovation Officer",
+    bio: "Leading the technology and innovation strategy that powers Golden Roots' modern approach to land ownership.",
+    photo: "/team/hafiz.png",
   },
 ];
 
@@ -46,25 +48,40 @@ export default function TeamSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {team.map((member) => (
-            <div key={member.name} className="group border border-gray-100 rounded-sm overflow-hidden hover:shadow-lg transition-shadow">
-              {/* Color block with initials */}
-              <div className={`${member.color} h-48 flex items-center justify-center relative`}>
-                <span className={`font-extrabold text-6xl ${member.textColor} opacity-30`}>{member.initials}</span>
-                <div className={`absolute bottom-6 right-6 w-16 h-16 rounded-full border-2 border-white/30 flex items-center justify-center`}>
-                  <span className={`font-bold text-lg ${member.textColor}`}>{member.initials}</span>
-                </div>
+            <div key={member.name} className="group border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-black/5 transition-shadow duration-300">
+              {/* Photo */}
+              <div className="relative bg-green-950 overflow-hidden" style={{ aspectRatio: "3/4" }}>
+                {member.photo ? (
+                  <Image
+                    src={member.photo}
+                    alt={member.name}
+                    fill
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-green-950">
+                    <div className="w-20 h-20 rounded-full border-2 border-dashed border-gold-400/40 flex items-center justify-center mb-4">
+                      <span className="text-gold-400/50 text-3xl font-bold">?</span>
+                    </div>
+                    <span className="text-white/20 text-xs font-bold tracking-widest uppercase">Photo Coming Soon</span>
+                  </div>
+                )}
+                {/* Gold accent bar at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gold-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               </div>
-              {/* Content */}
-              <div className="p-7">
-                <p className="text-green-950 font-bold text-xl mb-1">{member.name}</p>
-                <p className="text-gold-500 font-bold text-sm uppercase tracking-wider mb-4">{member.role}</p>
-                <p className="text-gray-600 text-sm leading-relaxed">{member.bio}</p>
+              {/* Info */}
+              <div className="p-6">
+                <p className="text-green-950 font-bold text-lg leading-tight mb-1">{member.name}</p>
+                <p className="text-gold-500 font-bold text-xs uppercase tracking-wider mb-3">{member.role}</p>
+                <p className="text-gray-500 text-sm leading-relaxed">{member.bio}</p>
               </div>
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );

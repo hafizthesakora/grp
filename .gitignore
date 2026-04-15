@@ -46,3 +46,6 @@ next-env.d.ts
 # Large video files — host separately if over 100MB
 public/videos/*.mov
 public/videos/*.webm
+
+# Runtime uploads (stored on Cloudinary, not in repo)
+public/uploads/

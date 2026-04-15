@@ -1,8 +1,52 @@
+"use client";
+
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Mail, Phone, MapPin, ArrowRight, ExternalLink, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, ArrowRight, ExternalLink, MessageCircle, CheckCircle2 } from "lucide-react";
+
+type FormState = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  landInterest: string;
+  message: string;
+};
 
 export default function ContactPage() {
+  const [form, setForm] = useState<FormState>({
+    firstName: "", lastName: "", email: "", phone: "", landInterest: "", message: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const set = (k: keyof FormState, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Submission failed. Please try again.");
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
+      setError("Network error. Please check your connection.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -94,56 +138,81 @@ export default function ContactPage() {
                   <span className="block w-6 h-px bg-gray-400" />
                   <span className="text-gray-500 font-bold text-sm tracking-widest uppercase">Send an Enquiry</span>
                 </div>
-                <form className="flex flex-col gap-5">
-                  <div className="grid grid-cols-2 gap-4">
+
+                {submitted ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="w-16 h-16 bg-gold-400 flex items-center justify-center mb-5">
+                      <CheckCircle2 className="w-8 h-8 text-green-950" />
+                    </div>
+                    <h3 className="text-green-950 font-bold text-xl mb-2">Message Received!</h3>
+                    <p className="text-gray-500 text-sm max-w-xs">
+                      Thank you, <strong>{form.firstName}</strong>. We&apos;ll respond to <strong>{form.email}</strong> within 24 hours.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">First Name *</label>
+                        <input type="text" required value={form.firstName} onChange={e => set("firstName", e.target.value)}
+                               placeholder="John"
+                               className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors" />
+                      </div>
+                      <div>
+                        <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Last Name *</label>
+                        <input type="text" required value={form.lastName} onChange={e => set("lastName", e.target.value)}
+                               placeholder="Mensah"
+                               className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors" />
+                      </div>
+                    </div>
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">First Name</label>
-                      <input type="text" placeholder="John"
+                      <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Email Address *</label>
+                      <input type="email" required value={form.email} onChange={e => set("email", e.target.value)}
+                             placeholder="your@email.com"
                              className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors" />
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Last Name</label>
-                      <input type="text" placeholder="Mensah"
+                      <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Phone / WhatsApp</label>
+                      <input type="tel" value={form.phone} onChange={e => set("phone", e.target.value)}
+                             placeholder="+1 234 567 8900"
                              className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors" />
                     </div>
-                  </div>
-                  <div>
-                    <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Email Address</label>
-                    <input type="email" placeholder="your@email.com"
-                           className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors" />
-                  </div>
-                  <div>
-                    <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Phone / WhatsApp</label>
-                    <input type="tel" placeholder="+1 234 567 8900"
-                           className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors" />
-                  </div>
-                  <div>
-                    <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Land Interest</label>
-                    <select className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors bg-white">
-                      <option value="">Select a land type...</option>
-                      <option>Residential Land</option>
-                      <option>Agro-Industrial Land</option>
-                      <option>Beach Land</option>
-                      <option>Off-Market Opportunity</option>
-                      <option>General Enquiry</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Message</label>
-                    <textarea rows={5} placeholder="Tell us about your goals, budget, and any specific requirements..."
-                              className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors resize-none" />
-                  </div>
-                  <button type="submit"
-                          className="inline-flex items-center justify-center gap-3 bg-green-950 hover:bg-green-800 text-white font-bold py-4 transition-colors">
-                    <span className="bg-gold-400 w-7 h-7 flex items-center justify-center">
-                      <ArrowRight className="w-3.5 h-3.5 text-green-950" />
-                    </span>
-                    Send Enquiry
-                  </button>
-                  <p className="text-gray-400 text-xs text-center">
-                    We respond within 24 hours · Your information is kept confidential
-                  </p>
-                </form>
+                    <div>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Land Interest</label>
+                      <select value={form.landInterest} onChange={e => set("landInterest", e.target.value)}
+                              className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors bg-white">
+                        <option value="">Select a land type...</option>
+                        <option>Residential Land</option>
+                        <option>Agro-Industrial Land</option>
+                        <option>Beach Land</option>
+                        <option>Off-Market Opportunity</option>
+                        <option>General Enquiry</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider font-bold block mb-2">Message *</label>
+                      <textarea rows={5} required value={form.message} onChange={e => set("message", e.target.value)}
+                                placeholder="Tell us about your goals, budget, and any specific requirements..."
+                                className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors resize-none" />
+                    </div>
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{error}</div>
+                    )}
+                    <button type="submit" disabled={submitting}
+                            className="inline-flex items-center justify-center gap-3 bg-green-950 hover:bg-green-800 text-white font-bold py-4 transition-colors disabled:opacity-60">
+                      {submitting
+                        ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        : <><span className="bg-gold-400 w-7 h-7 flex items-center justify-center">
+                            <ArrowRight className="w-3.5 h-3.5 text-green-950" />
+                          </span>
+                          Send Enquiry</>
+                      }
+                    </button>
+                    <p className="text-gray-400 text-xs text-center">
+                      We respond within 24 hours · Your information is kept confidential
+                    </p>
+                  </form>
+                )}
               </div>
             </div>
           </div>

@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { MapPin, ArrowRight, CheckSquare, Maximize2, Tag } from "lucide-react";
+import { MapPin, ArrowRight, CheckSquare } from "lucide-react";
 import Link from "next/link";
 import AnimateIn from "@/components/AnimateIn";
+import UmmiSaeedaSitePlan from "@/components/UmmiSaeedaSitePlan";
 
 const categories = [
   {
@@ -44,34 +45,13 @@ const categories = [
   },
 ];
 
-const ummisaeedaPlots = [
-  { id: "USV-001", type: "Residential", size: "80 × 80 ft", price: "$8,500", status: "available" },
-  { id: "USV-002", type: "Residential", size: "80 × 80 ft", price: "$8,500", status: "available" },
-  { id: "USV-003", type: "Residential", size: "80 × 80 ft", price: "$9,000", status: "reserved" },
-  { id: "USV-004", type: "Residential", size: "80 × 80 ft", price: "$8,500", status: "available" },
-  { id: "USV-005", type: "Residential", size: "80 × 80 ft", price: "$9,000", status: "available" },
-  { id: "USV-006", type: "Residential", size: "80 × 80 ft", price: "$8,500", status: "sold" },
-  { id: "USV-007", type: "Residential", size: "80 × 80 ft", price: "$9,500", status: "available" },
-  { id: "USV-008", type: "Residential", size: "80 × 80 ft", price: "$9,500", status: "available" },
-  { id: "USV-009", type: "Agro", size: "1 acre", price: "$14,000", status: "available" },
-  { id: "USV-010", type: "Agro", size: "1 acre", price: "$14,000", status: "reserved" },
-  { id: "USV-011", type: "Agro", size: "1 acre", price: "$14,500", status: "available" },
-  { id: "USV-012", type: "Residential", size: "80 × 80 ft", price: "$8,500", status: "sold" },
-];
-
-const statusStyle: Record<string, string> = {
-  available: "bg-green-100 text-green-800",
-  reserved:  "bg-gold-100  text-yellow-800",
-  sold:      "bg-gray-100  text-gray-500",
-};
-
 export default function PropertiesPage() {
   return (
     <>
       <Navbar />
       <main>
 
-        {/* ── PAGE HERO ─── */}
+        {/* ── PAGE HERO ── */}
         <section className="bg-green-950 pt-52 pb-20">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-20">
             <div className="flex items-center gap-2 mb-4">
@@ -100,7 +80,7 @@ export default function PropertiesPage() {
           </div>
         </div>
 
-        {/* ── LAND CATEGORIES WITH IMAGES ── */}
+        {/* ── LAND CATEGORIES ── */}
         <section className="bg-white py-20">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-20">
             <AnimateIn>
@@ -114,48 +94,46 @@ export default function PropertiesPage() {
             </AnimateIn>
 
             <div className="space-y-10">
-              {categories.map((p, i) => (
-                <AnimateIn key={p.id} delay={i * 0.08}>
-                  <div id={p.id} className="group grid lg:grid-cols-5 border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-black/5 transition-shadow duration-300">
+              {categories.map((cat, i) => (
+                <AnimateIn key={cat.id} delay={i * 0.08}>
+                  <div id={cat.id} className="group grid lg:grid-cols-5 border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-black/5 transition-shadow duration-300">
 
-                    {/* Image */}
                     <div className={`lg:col-span-2 relative min-h-64 ${i % 2 === 1 ? "lg:order-last" : ""}`}>
                       <Image
-                        src={p.image}
-                        alt={p.type}
+                        src={cat.image}
+                        alt={cat.type}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                         sizes="(max-width: 1024px) 100vw, 40vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-br from-green-950/70 to-green-950/30" />
                       <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                        <span className={`self-start text-xs font-bold px-3 py-1 ${p.accent}`}>{p.tag}</span>
+                        <span className={`self-start text-xs font-bold px-3 py-1 ${cat.accent}`}>{cat.tag}</span>
                         <div>
-                          <h2 className="text-white text-2xl font-bold mb-2">{p.type}</h2>
+                          <h2 className="text-white text-2xl font-bold mb-2">{cat.type}</h2>
                           <div className="flex items-center gap-1.5 text-white/50 text-sm mb-5">
-                            <MapPin className="w-3.5 h-3.5" />{p.location}
+                            <MapPin className="w-3.5 h-3.5" />{cat.location}
                           </div>
                           <div className="flex gap-6">
                             <div>
                               <p className="text-white/40 text-[10px] uppercase tracking-wider font-bold mb-0.5">Plot Size</p>
-                              <p className="text-white font-bold">{p.plotSize}</p>
+                              <p className="text-white font-bold">{cat.plotSize}</p>
                             </div>
                             <div>
                               <p className="text-white/40 text-[10px] uppercase tracking-wider font-bold mb-0.5">Min. Purchase</p>
-                              <p className="text-white font-bold">{p.minPurchase}</p>
+                              <p className="text-white font-bold">{cat.minPurchase}</p>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Content */}
                     <div className="lg:col-span-3 p-8 lg:p-10 flex flex-col justify-between">
                       <div>
-                        <p className="text-gray-600 leading-relaxed mb-7">{p.description}</p>
+                        <p className="text-gray-600 leading-relaxed mb-7">{cat.description}</p>
                         <p className="text-green-950 font-bold text-xs uppercase tracking-wider mb-4">What&apos;s Included</p>
                         <div className="grid grid-cols-2 gap-3 mb-8">
-                          {p.features.map(f => (
+                          {cat.features.map(f => (
                             <div key={f} className="flex items-center gap-2">
                               <CheckSquare className="w-4 h-4 text-gold-500 shrink-0" />
                               <span className="text-gray-700 text-sm">{f}</span>
@@ -184,13 +162,13 @@ export default function PropertiesPage() {
           </div>
         </section>
 
-        {/* ── UMMI SAEEDA VILLAGE ── */}
-        <section className="bg-green-950 py-20">
+        {/* ── UMMI SAEEDA VILLAGE — SITE PLAN ── */}
+        <section className="bg-green-950 py-16">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-20">
 
+            {/* Section header */}
             <AnimateIn>
-              {/* Estate header */}
-              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
                 <div>
                   <span className="inline-flex items-center gap-1.5 bg-gold-400 text-green-950 font-bold text-xs px-3 py-1 uppercase tracking-wider mb-4">
                     Active Estate — Now Selling
@@ -199,80 +177,22 @@ export default function PropertiesPage() {
                     Ummi Saeeda Village
                   </h2>
                   <p className="text-white/50 mt-2 max-w-xl">
-                    Our flagship estate in Mankessim, Central Region. Individual plots available for purchase — residential and agro-industrial.
+                    Our flagship estate in Mankessim, Central Region. Select any available plot on the site plan below.
                   </p>
                 </div>
-
-                {/* Estate image */}
-                <div className="relative h-48 w-full lg:w-80 overflow-hidden shrink-0">
-                  <Image
-                    src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80"
-                    alt="Ummi Saeeda Village"
-                    fill
-                    className="object-cover"
-                    sizes="320px"
-                  />
-                  <div className="absolute inset-0 bg-green-950/40" />
-                  <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-white/70 text-sm">
-                    <MapPin className="w-3.5 h-3.5" /> Mankessim, Central Region
-                  </div>
+                <div className="flex items-center gap-2 text-white/40 text-sm shrink-0">
+                  <MapPin className="w-4 h-4 text-gold-400" />
+                  Mankessim, Central Region
                 </div>
-              </div>
-
-              {/* Legend */}
-              <div className="flex items-center gap-6 mb-8">
-                {[
-                  { label: "Available", cls: "bg-green-100 text-green-800" },
-                  { label: "Reserved", cls: "bg-gold-100 text-yellow-800" },
-                  { label: "Sold", cls: "bg-gray-100 text-gray-500" },
-                ].map(l => (
-                  <span key={l.label} className={`text-xs font-bold px-3 py-1 ${l.cls}`}>{l.label}</span>
-                ))}
               </div>
             </AnimateIn>
 
-            {/* Plot grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {ummisaeedaPlots.map((plot, i) => (
-                <AnimateIn key={plot.id} delay={i * 0.04} direction="up">
-                  <div className={`border p-5 flex flex-col gap-3 ${
-                    plot.status === "available" ? "border-white/10 bg-white/5 hover:border-gold-400/50 hover:bg-white/8 transition-all" :
-                    plot.status === "reserved"  ? "border-yellow-500/20 bg-yellow-500/5" :
-                    "border-white/5 bg-white/3 opacity-50"
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/40 text-[10px] font-bold uppercase tracking-wider">Plot</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 ${statusStyle[plot.status]}`}>
-                        {plot.status.charAt(0).toUpperCase() + plot.status.slice(1)}
-                      </span>
-                    </div>
-                    <p className="text-white font-extrabold text-lg leading-none">{plot.id}</p>
-                    <div className="flex items-center gap-1.5 text-white/40 text-xs">
-                      <Maximize2 className="w-3 h-3" />
-                      {plot.size}
-                    </div>
-                    <div className="flex items-center justify-between border-t border-white/10 pt-3">
-                      <div className="flex items-center gap-1 text-white/40 text-xs">
-                        <Tag className="w-3 h-3" />
-                        {plot.type}
-                      </div>
-                      <span className="text-gold-400 font-extrabold text-sm">{plot.price}</span>
-                    </div>
+            {/* Animated site plan */}
+            <UmmiSaeedaSitePlan />
 
-                    {plot.status === "available" && (
-                      <Link href="/purchase"
-                            className="mt-1 w-full text-center py-2 bg-gold-400 hover:bg-gold-300 text-green-950 font-bold text-xs uppercase tracking-wider transition-colors">
-                        Secure Plot
-                      </Link>
-                    )}
-                  </div>
-                </AnimateIn>
-              ))}
-            </div>
-
-            {/* Note */}
-            <AnimateIn delay={0.2}>
-              <div className="mt-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white/5 border border-white/10 p-8">
+            {/* CTA footer */}
+            <AnimateIn delay={0.15}>
+              <div className="mt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white/5 border border-white/10 p-8">
                 <div>
                   <p className="text-white font-bold text-lg mb-1">Can&apos;t find your ideal plot?</p>
                   <p className="text-white/50 text-sm">Contact us about off-market listings or upcoming estates.</p>
@@ -286,6 +206,7 @@ export default function PropertiesPage() {
                 </Link>
               </div>
             </AnimateIn>
+
           </div>
         </section>
 
