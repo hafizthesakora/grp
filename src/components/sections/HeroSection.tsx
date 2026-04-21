@@ -34,7 +34,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 bg-green-950 -z-10" />
 
       {/* ── MAIN CONTENT ─────────────────────────────── */}
-      <div className="relative flex-1 flex flex-col justify-center max-w-[1440px] mx-auto w-full px-8 lg:px-20 pt-40 pb-8">
+      <div className="relative flex-1 flex flex-col justify-center max-w-[1440px] mx-auto w-full px-5 sm:px-8 lg:px-20 pt-28 sm:pt-36 lg:pt-40 pb-8">
         <div className="max-w-[860px]">
 
           {/* Headline — large, bold, Figma-style */}
@@ -96,7 +96,7 @@ export default function HeroSection() {
         className="relative w-full"
       >
         <div
-          className="mx-8 lg:mx-20 mb-10 max-w-[calc(1440px-160px)] xl:mx-auto"
+          className="mx-4 sm:mx-8 lg:mx-20 mb-6 sm:mb-10 max-w-[calc(1440px-160px)] xl:mx-auto"
           style={{
             background: "rgba(255,255,255,0.06)",
             backdropFilter: "blur(20px)",

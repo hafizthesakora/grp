@@ -406,7 +406,7 @@ export default function AdminDashboard() {
           </button>
         </header>
 
-        <div className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <span className="w-8 h-8 border-2 border-green-950/20 border-t-green-950 rounded-full animate-spin" />
@@ -483,12 +483,14 @@ export default function AdminDashboard() {
               {tab === "enquiries" && (
                 <div className="max-w-6xl space-y-4">
                   <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div className="overflow-x-auto">
+                    <div className="min-w-[700px]">
                     <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto] gap-4">
                       {["Client", "Contact", "Land Type", "Budget", "Date", "Actions"].map(h => (
                         <p key={h} className="text-gray-400 text-xs font-bold uppercase tracking-wider">{h}</p>
                       ))}
                     </div>
-                    {enquiries.length === 0 && <p className="px-6 py-12 text-gray-400 text-sm text-center">No enquiries yet.</p>}
+                    {enquiries.length === 0 && <p className="px-6 py-12 text-gray-400 text-sm text-center min-w-[700px]">No enquiries yet.</p>}
                     {enquiries.map((e, i) => (
                       <div key={e._id} className={`${i < enquiries.length - 1 ? "border-b border-gray-50" : ""}`}>
                         <div className="grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto] gap-4 items-center px-6 py-4 hover:bg-gray-50/50 transition-colors">
@@ -535,6 +537,8 @@ export default function AdminDashboard() {
                         )}
                       </div>
                     ))}
+                    </div>{/* /min-w */}
+                    </div>{/* /overflow-x-auto */}
                   </div>
                 </div>
               )}
@@ -588,6 +592,8 @@ export default function AdminDashboard() {
               {tab === "clients" && (
                 <div className="max-w-5xl space-y-4">
                   <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div className="overflow-x-auto">
+                    <div className="min-w-[600px]">
                     <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 grid grid-cols-[2fr_2fr_2fr_1fr_auto] gap-4">
                       {["Client", "Email", "Journey", "Since", "Actions"].map(h => (
                         <p key={h} className="text-gray-400 text-xs font-bold uppercase tracking-wider">{h}</p>
@@ -634,6 +640,8 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     ))}
+                    </div>{/* /min-w */}
+                    </div>{/* /overflow-x-auto */}
                   </div>
                 </div>
               )}

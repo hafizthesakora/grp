@@ -1,215 +1,142 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX } from "lucide-react";
-
-const clips = [
-  { src: "/videos/hero.mp4", label: "Ummi Saeeda Village" },
-  { src: "/videos/mankessim.mp4", label: "Mankessim, Central Region" },
-];
+import { useEffect, useRef, useState } from "react";
+import { Volume2, VolumeX, MapPin } from "lucide-react";
+import Link from "next/link";
 
 export default function MontageSection() {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [muted, setMuted] = useState(true);
 
-  const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [activeClip, setActiveClip] = useState(0);
-  const [started, setStarted] = useState(false);
-  const clipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Rotate clips every 8 s while playing
-  const scheduleNext = useCallback(() => {
-    if (clipTimerRef.current) clearTimeout(clipTimerRef.current);
-    clipTimerRef.current = setTimeout(() => {
-      setActiveClip(c => (c + 1) % clips.length);
-    }, 8000);
+  // Auto-play video + pause when out of view
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+          audioRef.current?.play().catch(() => {});
+        } else {
+          video.pause();
+          audioRef.current?.pause();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(sectionRef.current!);
+    return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (playing) scheduleNext();
-    return () => { if (clipTimerRef.current) clearTimeout(clipTimerRef.current); };
-  }, [playing, activeClip, scheduleNext]);
-
-  // Play the active clip video
-  useEffect(() => {
-    videoRefs.current.forEach((v, i) => {
-      if (!v) return;
-      if (i === activeClip) {
-        v.currentTime = 0;
-        if (playing) v.play().catch(() => {});
-      } else {
-        v.pause();
-      }
-    });
-  }, [activeClip, playing]);
-
-  // Pause all when not playing
-  useEffect(() => {
-    if (!playing) {
-      videoRefs.current.forEach(v => v?.pause());
-      audioRef.current?.pause();
-    } else {
-      videoRefs.current[activeClip]?.play().catch(() => {});
-      audioRef.current?.play().catch(() => {});
-    }
-  }, [playing, activeClip]);
-
-  // Sync audio mute
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.muted = muted;
-  }, [muted]);
-
-  // Pause when scrolled out of view
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (!entry.isIntersecting && playing) setPlaying(false); },
-      { threshold: 0.1 }
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [playing]);
-
-  function handlePlay() {
-    setStarted(true);
-    setPlaying(p => !p);
+  function toggleMute() {
+    const next = !muted;
+    setMuted(next);
+    if (audioRef.current) audioRef.current.muted = next;
   }
 
   return (
-    <section ref={sectionRef} className="relative bg-black overflow-hidden" style={{ height: "90vh", minHeight: 520 }}>
+    <section ref={sectionRef} className="relative overflow-hidden bg-black" style={{ height: "85vh", minHeight: 480 }}>
 
-      {/* ── VIDEO CLIPS ── */}
-      {clips.map((clip, i) => (
-        <video
-          key={clip.src}
-          ref={el => { videoRefs.current[i] = el; }}
-          src={clip.src}
-          loop
-          muted
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-          style={{ opacity: activeClip === i && playing ? 1 : 0 }}
-        />
-      ))}
+      {/* Background video */}
+      <video
+        ref={videoRef}
+        src="/videos/ummi-saeeda.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
 
-      {/* ── AUDIO ── */}
-      {/* Drop your song at public/audio/theme.mp3 */}
-      <audio ref={audioRef} src="/audio/theme.mp3" loop preload="auto" />
+      {/* Audio track */}
+      <audio ref={audioRef} src="/audio/theme.mp3" loop preload="none" muted />
 
-      {/* ── OVERLAY ── */}
+      {/* Cinematic overlay */}
       <div
         className="absolute inset-0"
         style={{
-          background: playing
-            ? "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.50) 100%)"
-            : "rgba(0,0,0,0.80)",
-          transition: "background 1.2s ease",
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.20) 40%, rgba(0,0,0,0.65) 100%)",
         }}
       />
 
-      {/* ── CENTRE CONTENT ── */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-
-        {!started ? (
-          /* Pre-play state */
-          <div className="flex flex-col items-center gap-6">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="block w-8 h-px bg-[#c9a84c]/60" />
-              <span className="text-[#c9a84c]/80 font-bold text-xs tracking-[0.25em] uppercase">Golden Roots Properties</span>
-              <span className="block w-8 h-px bg-[#c9a84c]/60" />
-            </div>
-            <h2
-              className="font-extrabold text-white leading-tight"
-              style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
-            >
-              Our Land.<br />
-              <span className="text-[#c9a84c]">Our Story.</span>
-            </h2>
-            <p className="text-white/50 text-base max-w-sm leading-relaxed">
-              Experience the land that generations will call home — in sound and vision.
-            </p>
-            <button
-              onClick={handlePlay}
-              className="group mt-2 w-20 h-20 rounded-full border-2 border-white/30 hover:border-[#c9a84c] flex items-center justify-center transition-all duration-300 hover:scale-105"
-              style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" }}
-            >
-              <Play className="w-7 h-7 text-white fill-white translate-x-0.5 group-hover:text-[#c9a84c] group-hover:fill-[#c9a84c] transition-colors" />
-            </button>
-            <p className="text-white/25 text-xs tracking-widest uppercase">Tap to play</p>
-          </div>
-        ) : (
-          /* Playing / paused state */
-          <div className="flex flex-col items-center gap-4">
-            {/* Clip label */}
-            <span
-              className="text-[#c9a84c] font-bold text-xs tracking-[0.2em] uppercase transition-opacity duration-500"
-              style={{ opacity: playing ? 1 : 0 }}
-            >
-              {clips[activeClip].label}
-            </span>
-
-            {/* Big play/pause */}
-            <button
-              onClick={handlePlay}
-              className="group w-16 h-16 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center transition-all"
-              style={{ background: "rgba(0,0,0,0.40)", backdropFilter: "blur(10px)" }}
-            >
-              {playing
-                ? <Pause className="w-6 h-6 text-white group-hover:text-[#c9a84c] transition-colors" />
-                : <Play className="w-6 h-6 text-white fill-white translate-x-0.5 group-hover:text-[#c9a84c] group-hover:fill-[#c9a84c] transition-colors" />
-              }
-            </button>
-          </div>
-        )}
+      {/* Top-left badge */}
+      <div className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 z-10">
+        <div className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse" />
+        <span className="text-white/70 font-bold text-xs tracking-[0.2em] uppercase">Live Footage</span>
       </div>
 
-      {/* ── BOTTOM BAR ── */}
-      <div className="absolute bottom-0 left-0 right-0 px-6 lg:px-12 py-6 flex items-end justify-between">
+      {/* Mute toggle */}
+      <button
+        onClick={toggleMute}
+        className="absolute top-5 right-4 sm:right-8 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-white/10"
+        style={{ background: "rgba(0,0,0,0.35)", backdropFilter: "blur(8px)" }}
+        aria-label={muted ? "Unmute" : "Mute"}
+      >
+        {muted
+          ? <VolumeX className="w-4 h-4 text-white/60" />
+          : <Volume2 className="w-4 h-4 text-white" />
+        }
+      </button>
 
-        {/* Clip dots */}
-        <div className="flex items-center gap-2">
-          {clips.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setActiveClip(i); if (!playing && started) setPlaying(true); scheduleNext(); }}
-              className="transition-all duration-300"
-              style={{
-                width: activeClip === i && playing ? 28 : 6,
-                height: 6,
-                borderRadius: 3,
-                background: activeClip === i && playing ? "#c9a84c" : "rgba(255,255,255,0.25)",
-              }}
-            />
-          ))}
+      {/* Centre content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+        <div className="flex items-center gap-2 mb-5">
+          <span className="block w-8 h-px bg-[#c9a84c]/60" />
+          <span className="text-[#c9a84c] font-bold text-xs tracking-[0.25em] uppercase">Golden Roots Properties</span>
+          <span className="block w-8 h-px bg-[#c9a84c]/60" />
         </div>
 
-        {/* Right controls */}
-        <div className="flex items-center gap-3">
-          {/* Mute toggle — only visible once started */}
-          {started && (
-            <button
-              onClick={() => setMuted(m => !m)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-white/10"
-              style={{ background: "rgba(0,0,0,0.30)", backdropFilter: "blur(8px)" }}
-              aria-label={muted ? "Unmute" : "Mute"}
-            >
-              {muted
-                ? <VolumeX className="w-4 h-4 text-white/60" />
-                : <Volume2 className="w-4 h-4 text-white" />
-              }
-            </button>
-          )}
+        <h2
+          className="font-extrabold text-white leading-tight mb-4"
+          style={{ fontSize: "clamp(30px, 5.5vw, 72px)" }}
+        >
+          Ummi Saeeda Village.<br />
+          <span className="text-[#c9a84c]">Our Land. Our Story.</span>
+        </h2>
 
-          {/* Brand watermark */}
-          <div className="text-right">
-            <p className="text-white/60 font-extrabold text-sm leading-none">Golden Roots</p>
-            <p className="text-[#c9a84c] text-[10px] font-bold tracking-[0.2em] uppercase mt-0.5">Properties</p>
-          </div>
+        <p
+          className="text-white/60 leading-relaxed max-w-xl mb-8"
+          style={{ fontSize: "clamp(14px, 1.4vw, 18px)" }}
+        >
+          Walk through the streets, see the plots, feel the community.
+          Mankessim&apos;s fastest-growing estate — built for the diaspora, rooted in Ghana.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <Link
+            href="/purchase"
+            className="inline-flex items-center gap-2.5 bg-[#c9a84c] hover:bg-amber-400 text-green-950 font-bold text-sm px-6 py-3 transition-all hover:shadow-lg hover:shadow-[#c9a84c]/30"
+          >
+            Secure Your Plot
+          </Link>
+          <Link
+            href="/properties"
+            className="inline-flex items-center gap-2 border border-white/30 hover:border-white/60 text-white font-semibold text-sm px-6 py-3 transition-all"
+          >
+            View All Properties
+          </Link>
         </div>
+      </div>
+
+      {/* Bottom-left location pill */}
+      <div className="absolute bottom-6 left-4 sm:left-8 z-10">
+        <div
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-white/80"
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)" }}
+        >
+          <MapPin className="w-3 h-3 text-[#c9a84c] shrink-0" />
+          Mankessim, Central Region, Ghana
+        </div>
+      </div>
+
+      {/* Bottom-right brand */}
+      <div className="absolute bottom-6 right-4 sm:right-8 z-10 text-right">
+        <p className="text-white/50 font-extrabold text-xs leading-none">Golden Roots</p>
+        <p className="text-[#c9a84c] text-[10px] font-bold tracking-[0.2em] uppercase mt-0.5">Properties</p>
       </div>
     </section>
   );

@@ -211,7 +211,7 @@ export default function PurchasePage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-green-50 pt-52 pb-20">
+      <main className="min-h-screen bg-green-50 pt-36 sm:pt-44 lg:pt-52 pb-20">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
 
           {/* Header */}
@@ -231,21 +231,21 @@ export default function PurchasePage() {
               <button
                 key={s}
                 onClick={() => i < step && setStep(i)}
-                className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
+                className={`flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors leading-tight ${
                   i === step ? "bg-green-950 text-white" :
                   i < step ? "bg-gold-400 text-green-950 cursor-pointer" :
                   "text-gray-400 cursor-default"
                 }`}
               >
-                <span className="hidden sm:inline">{s}</span>
-                <span className="sm:hidden">{i + 1}</span>
+                <span className="hidden md:inline">{s}</span>
+                <span className="md:hidden">{i + 1}</span>
               </button>
             ))}
           </div>
 
           {/* Form card */}
           <div className="bg-white border border-gray-100 rounded-sm overflow-hidden shadow-sm">
-            <div className="p-8">
+            <div className="p-5 sm:p-8">
 
               {/* Step 0 — Your Details */}
               {step === 0 && (
@@ -554,9 +554,9 @@ export default function PurchasePage() {
 
             {/* Nav buttons */}
             {(stepError || submitError) && (
-              <div className="mx-8 mb-0 mt-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{stepError || submitError}</div>
+              <div className="mx-5 sm:mx-8 mb-0 mt-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{stepError || submitError}</div>
             )}
-            <div className="px-8 py-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+            <div className="px-5 sm:px-8 py-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
               <button onClick={() => { setStep(s => Math.max(0, s - 1)); setStepError(""); }} disabled={step === 0}
                       className="inline-flex items-center gap-2 text-gray-500 hover:text-green-950 font-semibold text-sm disabled:opacity-30 transition-colors">
                 <ArrowLeft className="w-4 h-4" /> Back
