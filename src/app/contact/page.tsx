@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Mail, Phone, MapPin, ArrowRight, ExternalLink, MessageCircle, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { Mail, Phone, MapPin, ArrowRight, ExternalLink, MessageCircle, CheckCircle2, ShieldCheck, Lock, BadgeCheck } from "lucide-react";
 
 type FormState = {
   firstName: string;
@@ -12,20 +13,22 @@ type FormState = {
   phone: string;
   landInterest: string;
   message: string;
+  agreed: boolean;
 };
 
 export default function ContactPage() {
   const [form, setForm] = useState<FormState>({
-    firstName: "", lastName: "", email: "", phone: "", landInterest: "", message: "",
+    firstName: "", lastName: "", email: "", phone: "", landInterest: "", message: "", agreed: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
-  const set = (k: keyof FormState, v: string) => setForm(f => ({ ...f, [k]: v }));
+  const set = (k: keyof FormState, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.agreed) { setError("Please confirm you have read and agree to the Privacy Policy."); return; }
     setSubmitting(true);
     setError("");
     try {
@@ -195,6 +198,36 @@ export default function ContactPage() {
                                 placeholder="Tell us about your goals, budget, and any specific requirements..."
                                 className="w-full border border-gray-200 px-4 py-3 text-sm text-green-950 focus:outline-none focus:border-gold-400 transition-colors resize-none" />
                     </div>
+                    {/* Legal consent */}
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.agreed}
+                        onChange={e => set("agreed", e.target.checked)}
+                        className="mt-0.5 accent-gold-400 w-4 h-4 shrink-0"
+                      />
+                      <span className="text-gray-500 text-xs leading-relaxed">
+                        I agree to Golden Roots Properties contacting me regarding this enquiry and confirm that I have read the{" "}
+                        <Link href="/privacy-policy" target="_blank" className="text-green-700 hover:text-green-900 underline underline-offset-2">Privacy Policy</Link>
+                        {" "}and{" "}
+                        <Link href="/terms" target="_blank" className="text-green-700 hover:text-green-900 underline underline-offset-2">Terms &amp; Conditions</Link>.
+                      </span>
+                    </label>
+
+                    {/* Trust signals */}
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { icon: ShieldCheck, text: "Lands Commission Verified" },
+                        { icon: Lock, text: "SSL Encrypted" },
+                        { icon: BadgeCheck, text: "Data Never Sold" },
+                      ].map(t => (
+                        <div key={t.text} className="flex flex-col items-center gap-1.5 bg-green-50 border border-green-100 p-3 text-center">
+                          <t.icon className="w-4 h-4 text-green-700" />
+                          <span className="text-green-800 text-xs font-semibold leading-snug">{t.text}</span>
+                        </div>
+                      ))}
+                    </div>
+
                     {error && (
                       <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{error}</div>
                     )}
@@ -209,7 +242,7 @@ export default function ContactPage() {
                       }
                     </button>
                     <p className="text-gray-400 text-xs text-center">
-                      We respond within 24 hours · Your information is kept confidential
+                      We respond within 24 hours · SSL encrypted · Your data is never sold to third parties
                     </p>
                   </form>
                 )}

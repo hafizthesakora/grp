@@ -1,10 +1,35 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, ArrowRight, ShieldCheck, FileText, BadgeCheck, Lock } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-green-950 border-t border-white/10">
+    <footer className="bg-green-950">
+      {/* ── TRUST BAR ────────────────────────────────────────────── */}
+      <div className="border-b border-white/10">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { icon: ShieldCheck, title: "Ghana Lands Commission", sub: "Verified plots only" },
+              { icon: FileText, title: "Full Documentation", sub: "Indenture + Site Plan via DHL" },
+              { icon: BadgeCheck, title: "100% Litigation-Free", sub: "Zero title disputes guaranteed" },
+              { icon: Lock, title: "Data Protected", sub: "Ghana Data Protection Act 2012" },
+            ].map(t => (
+              <div key={t.title} className="flex items-start gap-3">
+                <div className="w-9 h-9 bg-white/5 flex items-center justify-center shrink-0 rounded-sm">
+                  <t.icon className="w-4 h-4 text-gold-400" />
+                </div>
+                <div>
+                  <p className="text-white text-xs font-bold leading-snug">{t.title}</p>
+                  <p className="text-white/35 text-xs mt-0.5">{t.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── MAIN FOOTER ──────────────────────────────────────────── */}
       <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
@@ -35,7 +60,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Properties */}
+          {/* Land Types */}
           <div>
             <p className="text-white font-bold text-sm uppercase tracking-wider mb-5">Land Types</p>
             <ul className="space-y-3">
@@ -64,27 +89,38 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
-                <span className="text-white/40 text-sm">Central Region, Ghana</span>
+                <span className="text-white/40 text-sm">Mankessim, Central Region, Ghana</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            <p className="text-white/30 text-sm">© {new Date().getFullYear()} Golden Roots Properties. All rights reserved.</p>
-            <Link href="/portal" className="text-white/20 hover:text-white/50 text-xs transition-colors">Client Portal</Link>
+        {/* Legal disclaimer */}
+        <div className="mt-12 pt-8 border-t border-white/10">
+          <p className="text-white/20 text-xs leading-relaxed mb-6 max-w-4xl">
+            <strong className="text-white/30">Disclaimer:</strong> All land listings on this site are for informational purposes only and do not constitute a binding offer for sale.
+            Land values can decrease as well as increase. Golden Roots Properties does not guarantee investment returns or future market performance.
+            Buyers are advised to seek independent legal counsel before entering into any land purchase agreement.
+            All transactions are governed by the laws of the Republic of Ghana, including the Land Act 2020 (Act 1036).
+          </p>
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <p className="text-white/30 text-sm">© {new Date().getFullYear()} Golden Roots Properties. All rights reserved.</p>
+              <Link href="/privacy-policy" className="text-white/25 hover:text-white/60 text-xs transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="text-white/25 hover:text-white/60 text-xs transition-colors">Terms &amp; Conditions</Link>
+              <Link href="/portal" className="text-white/20 hover:text-white/50 text-xs transition-colors">Client Portal</Link>
+            </div>
+            <Link
+              href="/purchase"
+              className="inline-flex items-center gap-2 bg-gold-400 hover:bg-gold-300 text-green-950 font-bold text-sm px-3 pr-5 py-2.5 transition-colors"
+            >
+              <span className="bg-white w-6 h-6 flex items-center justify-center">
+                <ArrowRight className="w-3 h-3 text-green-900" />
+              </span>
+              Start Your Journey
+            </Link>
           </div>
-          <Link
-            href="/purchase"
-            className="inline-flex items-center gap-2 bg-gold-400 hover:bg-gold-300 text-green-950 font-bold text-sm px-3 pr-5 py-2.5 transition-colors"
-          >
-            <span className="bg-white w-6 h-6 flex items-center justify-center">
-              <ArrowRight className="w-3 h-3 text-green-900" />
-            </span>
-            Start Your Journey
-          </Link>
         </div>
       </div>
     </footer>

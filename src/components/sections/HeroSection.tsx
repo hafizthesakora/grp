@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Play, ChevronDown } from "lucide-react";
+import { ArrowRight, Play, ChevronDown, ShieldCheck, FileText, BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function HeroSection() {
@@ -84,6 +84,25 @@ export default function HeroSection() {
             >
               See How It Works
             </Link>
+          </motion.div>
+
+          {/* Trust badge strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.75 }}
+            className="flex flex-wrap gap-5 mt-8"
+          >
+            {[
+              { icon: ShieldCheck, text: "Lands Commission Verified" },
+              { icon: FileText, text: "Full Title Documentation" },
+              { icon: BadgeCheck, text: "Litigation-Free Guarantee" },
+            ].map(b => (
+              <div key={b.text} className="flex items-center gap-2">
+                <b.icon className="w-4 h-4 text-gold-400 shrink-0" />
+                <span className="text-white/55 text-xs font-semibold tracking-wide">{b.text}</span>
+              </div>
+            ))}
           </motion.div>
         </div>
       </div>

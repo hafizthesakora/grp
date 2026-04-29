@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ArrowRight, ArrowLeft, CheckCircle2, Upload, X, ImageIcon } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Upload, X, ImageIcon, ShieldCheck, Lock, BadgeCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -529,8 +529,30 @@ export default function PurchasePage() {
                     </div>
                   </div>
 
-                  <div className="mt-5 bg-gold-50 border border-gold-200 p-4">
-                    <p className="text-gray-600 text-sm">By submitting you agree to be contacted by Golden Roots Properties. Your information is kept confidential.</p>
+                  {/* Trust signals */}
+                  <div className="mt-5 grid grid-cols-3 gap-3">
+                    {[
+                      { icon: ShieldCheck, text: "Lands Commission Verified" },
+                      { icon: Lock, text: "Data Protected" },
+                      { icon: BadgeCheck, text: "No Upfront Commitment" },
+                    ].map(t => (
+                      <div key={t.text} className="flex flex-col items-center gap-1.5 bg-green-50 border border-green-100 p-3 text-center">
+                        <t.icon className="w-4 h-4 text-green-700" />
+                        <span className="text-green-800 text-xs font-semibold leading-snug">{t.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 bg-gold-50 border border-gold-200 p-4">
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      By submitting this enquiry you agree to be contacted by Golden Roots Properties regarding
+                      your land interest and confirm that you have read and accept our{" "}
+                      <Link href="/privacy-policy" target="_blank" className="text-green-700 hover:text-green-900 font-semibold underline underline-offset-2">Privacy Policy</Link>
+                      {" "}and{" "}
+                      <Link href="/terms" target="_blank" className="text-green-700 hover:text-green-900 font-semibold underline underline-offset-2">Terms &amp; Conditions</Link>.
+                      Submitting this form does not constitute a binding purchase agreement.
+                      Your information is kept strictly confidential and is never sold to third parties.
+                    </p>
                   </div>
 
                   {/* Upload progress */}

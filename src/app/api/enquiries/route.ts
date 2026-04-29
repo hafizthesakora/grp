@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Enquiry } from "@/models/Enquiry";
+import {
+  sendMail,
+  buildEnquiryNotification,
+  buildEnquiryConfirmation,
+} from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +36,18 @@ export async function POST(request: NextRequest) {
       completedSteps: [1],
       currentStep: 2,
     });
+
+    const notification = buildEnquiryNotification({
+      firstName, lastName, email, phone, country,
+      landType, plots, purpose, budget, timeline, paymentPlan, additionalInfo,
+      plotRef: enquiry.plotRef,
+    });
+    const confirmation = buildEnquiryConfirmation(firstName, enquiry.plotRef);
+
+    await Promise.allSettled([
+      sendMail({ to: "goldenrootssocial@gmail.com", ...notification }),
+      sendMail({ to: email, subject: confirmation.subject, html: confirmation.html }),
+    ]);
 
     return Response.json({ success: true, plotRef: enquiry.plotRef, firstName }, { status: 201 });
   } catch (err) {
