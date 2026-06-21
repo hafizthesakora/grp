@@ -5,7 +5,9 @@ import {
   sendMail,
   buildEnquiryNotification,
   buildEnquiryConfirmation,
+  OFFICIAL_EMAIL,
 } from "@/lib/email";
+import { requireRole } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
     const confirmation = buildEnquiryConfirmation(firstName, enquiry.plotRef);
 
     await Promise.allSettled([
-      sendMail({ to: "goldenrootssocial@gmail.com", ...notification }),
+      sendMail({ to: OFFICIAL_EMAIL, fromName: `${firstName} ${lastName}`, ...notification }),
       sendMail({ to: email, subject: confirmation.subject, html: confirmation.html }),
     ]);
 
@@ -56,7 +58,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { response } = await requireRole(request, ["admin"]);
+  if (response) return response;
   try {
     await connectDB();
     const enquiries = await Enquiry.find().sort({ createdAt: -1 }).lean();

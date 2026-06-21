@@ -22,8 +22,6 @@ export default function PortalLoginPage() {
         body: JSON.stringify({ email, password }),
       });
       if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("grp_session", JSON.stringify(data.user));
         window.location.href = "/portal/dashboard";
       } else {
         const data = await res.json();

@@ -2,12 +2,13 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { Enquiry } from "@/models/Enquiry";
-import crypto from "crypto";
-
-function hash(p: string) { return crypto.createHash("sha256").update(p).digest("hex"); }
+import { hashPassword } from "@/lib/password";
+import { requireRole } from "@/lib/auth";
 
 // GET — list all client users with their enquiry
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { response } = await requireRole(request, ["admin"]);
+  if (response) return response;
   try {
     await connectDB();
     const clients = await User.find({ role: "client" }).select("-passwordHash").sort({ createdAt: -1 }).lean();
@@ -27,6 +28,8 @@ export async function GET() {
 
 // POST — create a portal account for a client
 export async function POST(request: NextRequest) {
+  const { response } = await requireRole(request, ["admin"]);
+  if (response) return response;
   try {
     const { name, email, password } = await request.json();
     if (!name || !email || !password) {
@@ -39,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
     const user = await User.create({
       email: email.toLowerCase().trim(),
-      passwordHash: hash(password),
+      passwordHash: await hashPassword(password),
       name: name.trim(),
       role: "client",
     });

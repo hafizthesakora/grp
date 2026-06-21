@@ -89,9 +89,9 @@ export default function Navbar() {
               <Image
                 src="/logo.png"
                 alt="Golden Roots Properties"
-                width={220}
-                height={83}
-                className="h-12 sm:h-16 lg:h-20 w-auto object-contain"
+                width={225}
+                height={225}
+                className="h-12 w-12 sm:h-16 sm:w-16 lg:h-20 lg:w-20 object-contain"
                 priority
               />
             )}

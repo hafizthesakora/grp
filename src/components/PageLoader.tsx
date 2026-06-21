@@ -74,9 +74,9 @@ export default function PageLoader() {
         <Image
           src="/logo.png"
           alt="Golden Roots Properties"
-          width={200}
-          height={75}
-          className="h-20 w-auto object-contain"
+          width={225}
+          height={225}
+          className="h-20 w-20 object-contain"
           priority
         />
       </div>

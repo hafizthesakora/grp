@@ -27,7 +27,6 @@ export default function AdminLoginPage() {
           setLoading(false);
           return;
         }
-        localStorage.setItem("grp_admin_session", JSON.stringify(data.user));
         window.location.href = "/admin/dashboard";
       } else {
         const data = await res.json();

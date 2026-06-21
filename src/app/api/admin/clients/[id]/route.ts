@@ -2,14 +2,15 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Enquiry } from "@/models/Enquiry";
 import { User } from "@/models/User";
-import crypto from "crypto";
-
-function hash(p: string) { return crypto.createHash("sha256").update(p).digest("hex"); }
+import { hashPassword } from "@/lib/password";
+import { requireRole } from "@/lib/auth";
 
 // PUT /api/admin/clients/[id]
 // Body can contain: { completedSteps, currentStep } to update journey
 //                or { password } to reset password
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { response } = await requireRole(request, ["admin"]);
+  if (response) return response;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -30,7 +31,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       if (!body.password || body.password.length < 6) {
         return Response.json({ error: "Password must be at least 6 characters" }, { status: 400 });
       }
-      const user = await User.findByIdAndUpdate(id, { passwordHash: hash(body.password) }, { new: true });
+      const user = await User.findByIdAndUpdate(id, { passwordHash: await hashPassword(body.password) }, { new: true });
       if (!user) return Response.json({ error: "User not found" }, { status: 404 });
       return Response.json({ success: true });
     }
@@ -43,7 +44,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // DELETE /api/admin/clients/[id] — remove portal account
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { response } = await requireRole(request, ["admin"]);
+  if (response) return response;
   try {
     const { id } = await params;
     await connectDB();

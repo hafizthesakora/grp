@@ -1,11 +1,8 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import crypto from "crypto";
-
-function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password).digest("hex");
-}
+import { verifyPassword, hashPassword, isLegacyHash } from "@/lib/password";
+import { createSessionToken, SESSION_COOKIE } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,21 +15,36 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() }).lean();
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
 
-    if (!user) {
+    if (!user || !(await verifyPassword(password, user.passwordHash))) {
       return Response.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const hash = hashPassword(password);
-    if (hash !== user.passwordHash) {
-      return Response.json({ error: "Invalid credentials" }, { status: 401 });
+    if (isLegacyHash(user.passwordHash)) {
+      user.passwordHash = await hashPassword(password);
+      await user.save();
     }
 
-    return Response.json({
+    const token = await createSessionToken({
+      sub: String(user._id),
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    });
+
+    const response = NextResponse.json({
       success: true,
       user: { name: user.name, email: user.email, role: user.role },
     });
+    response.cookies.set(SESSION_COOKIE, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+    return response;
   } catch (err) {
     console.error("POST /api/auth/login error:", err);
     return Response.json({ error: "Login failed" }, { status: 500 });

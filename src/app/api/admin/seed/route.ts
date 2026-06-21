@@ -1,8 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import crypto from "crypto";
-
-function hash(p: string) { return crypto.createHash("sha256").update(p).digest("hex"); }
+import { hashPassword } from "@/lib/password";
 
 // GET /api/admin/seed  — run once to create the admin account (dev only)
 export async function GET() {
@@ -16,7 +14,7 @@ export async function GET() {
     if (existing) return Response.json({ message: "Admin already exists" });
     await User.create({
       email: "admin@goldenroots.com",
-      passwordHash: hash(adminPassword),
+      passwordHash: await hashPassword(adminPassword),
       name: "Golden Roots Admin",
       role: "admin",
     });

@@ -5,6 +5,7 @@ import {
   sendMail,
   buildContactNotification,
   buildContactConfirmation,
+  OFFICIAL_EMAIL,
 } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     const confirmation = buildContactConfirmation(firstName, email);
 
     await Promise.allSettled([
-      sendMail({ to: "goldenrootssocial@gmail.com", ...notification }),
+      sendMail({ to: OFFICIAL_EMAIL, fromName: `${firstName} ${lastName}`, ...notification }),
       sendMail({ to: email, subject: confirmation.subject, html: confirmation.html }),
     ]);
 

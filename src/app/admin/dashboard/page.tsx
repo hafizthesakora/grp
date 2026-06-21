@@ -317,19 +317,18 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    const raw = localStorage.getItem("grp_admin_session");
-    if (!raw) { router.replace("/admin"); return; }
-    try {
-      const s = JSON.parse(raw);
-      if (s.role !== "admin") { router.replace("/admin"); return; }
-      setAdminName(s.name);
-    } catch { router.replace("/admin"); return; }
-    fetchAll();
+    fetch("/api/auth/me")
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(data => {
+        if (data.user.role !== "admin") { router.replace("/admin"); return; }
+        setAdminName(data.user.name);
+        fetchAll();
+      })
+      .catch(() => router.replace("/admin"));
   }, [router, fetchAll]);
 
   function signOut() {
-    localStorage.removeItem("grp_admin_session");
-    router.push("/admin");
+    fetch("/api/auth/logout", { method: "POST" }).finally(() => router.push("/admin"));
   }
 
   const navItems = [

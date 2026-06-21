@@ -1,10 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import crypto from "crypto";
-
-function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password).digest("hex");
-}
+import { hashPassword } from "@/lib/password";
 
 // GET /api/auth/seed — run once to create the demo user
 // Remove or protect this route before going to production
@@ -23,7 +19,7 @@ export async function GET() {
 
     await User.create({
       email: "demo@goldenroots.com",
-      passwordHash: hashPassword("demo123"),
+      passwordHash: await hashPassword("demo123"),
       name: "Samuel Owusu",
       role: "client",
     });

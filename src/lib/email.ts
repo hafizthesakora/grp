@@ -4,17 +4,17 @@ function createTransporter() {
   return nodemailer.createTransport({
     service: "gmail",
     auth: {
-      type: "OAuth2",
-      user: "goldenrootssocial@gmail.com",
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
     },
   });
 }
 
 const COMPANY = "Golden Roots Properties";
-const OFFICIAL_EMAIL = "goldenrootssocial@gmail.com";
+// The mailbox the team monitors for website interest — separate from the
+// SMTP-authenticated sending account (GMAIL_USER), which only relays mail.
+export const OFFICIAL_EMAIL = "goldenrootssocial@gmail.com";
+const SEND_FROM_ADDRESS = process.env.GMAIL_USER ?? OFFICIAL_EMAIL;
 const WHATSAPP = "+1 248-210-8333";
 const WEBSITE = process.env.NEXT_PUBLIC_BASE_URL ?? "https://goldenrootsproperties.com";
 
@@ -26,15 +26,19 @@ const emailBase = (body: string) => `
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${COMPANY}</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 0;">
+<body style="margin:0;padding:0;background:#eef2ee;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2ee;padding:40px 0;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:4px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(15,45,26,0.12);">
+        <!-- Accent bar -->
+        <tr><td style="background:#f4c430;height:5px;line-height:5px;font-size:0;">&nbsp;</td></tr>
         <!-- Header -->
         <tr>
-          <td style="background:#0f2d1a;padding:28px 40px;text-align:center;">
-            <p style="margin:0;color:#f4c430;font-size:22px;font-weight:700;letter-spacing:1px;">${COMPANY}</p>
-            <p style="margin:6px 0 0;color:rgba(255,255,255,0.5);font-size:12px;letter-spacing:2px;text-transform:uppercase;">Secure Land in Ghana</p>
+          <td style="background:#0f2d1a;padding:32px 40px;text-align:center;">
+            <img src="${WEBSITE}/logo.png" width="56" height="56" alt="${COMPANY}"
+                 style="display:block;margin:0 auto 12px;border-radius:8px;" />
+            <p style="margin:0;color:#f4c430;font-size:20px;font-weight:700;letter-spacing:1px;">${COMPANY}</p>
+            <p style="margin:6px 0 0;color:rgba(255,255,255,0.5);font-size:11px;letter-spacing:2px;text-transform:uppercase;">Secure Land in Ghana</p>
           </td>
         </tr>
         <!-- Body -->
@@ -61,9 +65,10 @@ export function buildContactNotification(data: {
   firstName: string; lastName: string; email: string;
   phone?: string; landInterest?: string; message: string;
 }) {
-  const subject = `New Enquiry: ${data.firstName} ${data.lastName} — ${COMPANY}`;
+  const subject = `[Website Contact Form] ${data.firstName} ${data.lastName}`;
   const html = emailBase(`
-    <h2 style="margin:0 0 24px;color:#0f2d1a;font-size:20px;">New Website Enquiry</h2>
+    <h2 style="margin:0 0 4px;color:#0f2d1a;font-size:20px;">New Website Contact Form Message</h2>
+    <p style="margin:0 0 24px;color:#999;font-size:12px;">Submitted via the Contact form on goldenrootsproperties.com</p>
     <table cellpadding="0" cellspacing="0" style="width:100%;">
       ${row("Name", `${data.firstName} ${data.lastName}`)}
       ${row("Email", `<a href="mailto:${data.email}" style="color:#2d6a4f;">${data.email}</a>`)}
@@ -81,11 +86,15 @@ export function buildContactNotification(data: {
 
 // ── CUSTOMER CONFIRMATION — contact form ────────────────────────────────────
 export function buildContactConfirmation(firstName: string, email: string) {
-  const subject = `We've received your enquiry — ${COMPANY}`;
+  const subject = `We've received your message — ${COMPANY} Website`;
   const html = emailBase(`
     <h2 style="margin:0 0 8px;color:#0f2d1a;font-size:22px;">Thank you, ${firstName}.</h2>
+    <p style="margin:0 0 4px;color:#555;font-size:15px;line-height:1.7;">
+      This confirms we've received the message you submitted through the contact form on
+      <strong>goldenrootsproperties.com</strong>.
+    </p>
     <p style="margin:0 0 28px;color:#555;font-size:15px;line-height:1.7;">
-      We've received your enquiry and a member of our team will be in touch within <strong>24 hours</strong>.
+      A member of our team will be in touch within <strong>24 hours</strong>.
     </p>
     <div style="background:#0f2d1a;border-radius:4px;padding:28px 32px;margin:0 0 28px;">
       <p style="margin:0 0 16px;color:#f4c430;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">What Happens Next</p>
@@ -178,10 +187,14 @@ export async function sendMail(opts: {
   subject: string;
   html: string;
   replyTo?: string;
+  // Display name shown in the recipient's inbox. Defaults to the company name
+  // (used for customer-facing confirmations); pass the submitter's name for
+  // internal notifications so the monitored inbox shows who's interested.
+  fromName?: string;
 }) {
   const transporter = createTransporter();
   await transporter.sendMail({
-    from: `"${COMPANY}" <${OFFICIAL_EMAIL}>`,
+    from: `"${opts.fromName ?? COMPANY}" <${SEND_FROM_ADDRESS}>`,
     to: opts.to,
     subject: opts.subject,
     html: opts.html,

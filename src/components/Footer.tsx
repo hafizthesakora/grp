@@ -35,7 +35,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="inline-block mb-5">
-              <Image src="/logo.png" alt="Golden Roots Properties" width={260} height={98} className="h-24 w-auto object-contain" />
+              <Image src="/logo.png" alt="Golden Roots Properties" width={225} height={225} className="h-24 w-24 object-contain" />
             </Link>
             <p className="text-white/40 text-sm leading-relaxed">
               Ghanaian-owned real estate company specialising in secure, litigation-free land in Mankessim, Central Region.

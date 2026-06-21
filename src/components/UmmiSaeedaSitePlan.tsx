@@ -49,10 +49,11 @@ interface FacilityCell {
  * ─────────────────────────────────────────────────────────────────────────*/
 
 /* ─── Status overrides ───────────────────────────────────────────────────── */
+// Outer-left column (44–52) is reserved per the latest site plan; every other
+// plot is available.
 const STATUS_OVERRIDE: Record<number, Status> = {
-  6: "sold", 17: "sold", 28: "sold", 45: "sold", 49: "sold",
-  2: "reserved", 9: "reserved", 16: "reserved", 25: "reserved",
-  30: "reserved", 35: "reserved", 38: "reserved", 47: "reserved",
+  44: "reserved", 45: "reserved", 46: "reserved", 47: "reserved",
+  48: "reserved", 49: "reserved", 50: "reserved", 51: "reserved", 52: "reserved",
 };
 
 function p(n: number, row: number, col: number, price = "$8,500"): PlotCell {

@@ -1,8 +1,12 @@
+import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Enquiry } from "@/models/Enquiry";
 import { User } from "@/models/User";
+import { requireRole } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { response } = await requireRole(request, ["admin"]);
+  if (response) return response;
   try {
     await connectDB();
     const enquiries = await Enquiry.find().sort({ createdAt: -1 }).lean();

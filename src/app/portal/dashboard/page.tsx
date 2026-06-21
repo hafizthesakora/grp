@@ -99,25 +99,22 @@ export default function PortalDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const raw = localStorage.getItem("grp_session");
-    if (!raw) { router.replace("/portal"); return; }
-    let parsed: SessionUser;
-    try { parsed = JSON.parse(raw); } catch { router.replace("/portal"); return; }
-    setSession(parsed);
-
-    fetch(`/api/portal/me?email=${encodeURIComponent(parsed.email)}`)
-      .then(r => r.json())
+    fetch("/api/auth/me")
+      .then(r => (r.ok ? r.json() : Promise.reject()))
       .then(data => {
-        if (data.enquiry) setEnquiry(data.enquiry);
+        setSession(data.user);
+        return fetch("/api/portal/me").then(r => r.json());
+      })
+      .then(data => {
+        if (data?.enquiry) setEnquiry(data.enquiry);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => router.replace("/portal"));
   }, [router]);
 
   function handleSignOut() {
-    localStorage.removeItem("grp_session");
     localStorage.removeItem("grp_welcome");
-    router.push("/portal");
+    fetch("/api/auth/logout", { method: "POST" }).finally(() => router.push("/portal"));
   }
 
   if (loading) {
