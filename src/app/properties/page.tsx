@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { MapPin, ArrowRight, CheckSquare } from "lucide-react";
+import { MapPin, ArrowRight, CheckSquare, Download } from "lucide-react";
 import Link from "next/link";
 import AnimateIn from "@/components/AnimateIn";
 import UmmiSaeedaSitePlan from "@/components/UmmiSaeedaSitePlan";
@@ -30,6 +30,7 @@ const categories = [
     image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=900&q=80",
     description: "Prime agricultural land suitable for farming, agribusiness, and industrial development. Ideal for investors capitalising on Ghana's growing agricultural sector.",
     features: ["Commercially zoned land", "Large-scale acquisition", "Agricultural & industrial use", "Full survey & site plan", "Lands Commission verified", "Post-purchase support"],
+    download: { label: "Download Beach & Farm Land Portfolio", href: "/docs/golden-roots-beach-farm-portfolio.pdf" },
   },
   {
     id: "beach",
@@ -42,6 +43,7 @@ const categories = [
     image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80",
     description: "Beachfront investment with exceptional appreciation potential along Ghana's coastline. Perfect for vacation homes, resort development, or long-term investment.",
     features: ["Prime coastal location", "High appreciation potential", "Vacation & resort use", "Full documentation package", "Virtual site tour available", "Limited plots only"],
+    download: { label: "Download Beach & Farm Land Portfolio", href: "/docs/golden-roots-beach-farm-portfolio.pdf" },
   },
 ];
 
@@ -153,6 +155,12 @@ export default function PropertiesPage() {
                               className="inline-flex items-center gap-2 border border-gray-200 hover:border-green-700 hover:text-green-800 text-gray-600 font-semibold text-sm px-5 py-2.5 transition-colors">
                           Enquire
                         </Link>
+                        {cat.download && (
+                          <a href={cat.download.href} download
+                             className="inline-flex items-center gap-2 text-green-800 hover:text-gold-600 font-semibold text-sm px-2 py-2.5 transition-colors">
+                            <Download className="w-4 h-4" /> Download Portfolio
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -180,9 +188,15 @@ export default function PropertiesPage() {
                     Our flagship estate in Mankessim, Central Region. Select any available plot on the site plan below.
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-white/40 text-sm shrink-0">
-                  <MapPin className="w-4 h-4 text-gold-400" />
-                  Mankessim, Central Region
+                <div className="flex flex-col items-start lg:items-end gap-3 shrink-0">
+                  <div className="flex items-center gap-2 text-white/40 text-sm">
+                    <MapPin className="w-4 h-4 text-gold-400" />
+                    Mankessim, Central Region
+                  </div>
+                  <a href="/docs/ummi-saeeda-village-estate-profile.pdf" download
+                     className="inline-flex items-center gap-2 border border-white/20 hover:border-gold-400 text-white/70 hover:text-gold-400 font-semibold text-sm px-4 py-2 transition-colors">
+                    <Download className="w-4 h-4" /> Download Estate Profile
+                  </a>
                 </div>
               </div>
             </AnimateIn>

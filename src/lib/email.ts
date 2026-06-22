@@ -94,8 +94,10 @@ export function buildContactConfirmation(firstName: string, email: string) {
       <strong>goldenrootsproperties.com</strong>.
     </p>
     <p style="margin:0 0 28px;color:#555;font-size:15px;line-height:1.7;">
-      A member of our team will be in touch within <strong>24 hours</strong>.
+      A member of our team will be in touch within <strong>24 hours</strong>. While you wait, take a look
+      through our portfolios below.
     </p>
+    ${portfolioLinks()}
     <div style="background:#0f2d1a;border-radius:4px;padding:28px 32px;margin:0 0 28px;">
       <p style="margin:0 0 16px;color:#f4c430;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">What Happens Next</p>
       ${step("1", "Our team reviews your enquiry and contacts you by phone or WhatsApp within 24 hours.")}
@@ -163,8 +165,9 @@ export function buildEnquiryConfirmation(firstName: string, plotRef: string) {
     <p style="margin:0 0 28px;font-size:28px;font-weight:700;color:#f4c430;letter-spacing:2px;">${plotRef}</p>
     <p style="margin:0 0 28px;color:#555;font-size:15px;line-height:1.7;">
       Our team will review your purchase enquiry and contact you within <strong>24 hours</strong> by phone or WhatsApp.
-      Please keep your reference number handy.
+      Please keep your reference number handy. While you wait, take a look through our portfolios below.
     </p>
+    ${portfolioLinks()}
     <div style="background:#0f2d1a;border-radius:4px;padding:28px 32px;margin:0 0 28px;">
       <p style="margin:0 0 16px;color:#f4c430;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Your Next Steps</p>
       ${step("1", "Team review & call/WhatsApp within 24 hours.")}
@@ -216,5 +219,23 @@ function step(num: string, text: string) {
     <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
       <div style="min-width:24px;height:24px;background:#f4c430;color:#0f2d1a;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;border-radius:2px;flex-shrink:0;">${num}</div>
       <p style="margin:0;color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;">${text}</p>
+    </div>`;
+}
+
+// Linked rather than attached — these PDFs run into the multi-megabyte range,
+// which risks Gmail attachment-size/deliverability issues on every send.
+function portfolioLinks() {
+  const docs = [
+    { label: "Beach & Farm Land Portfolio", href: `${WEBSITE}/docs/golden-roots-beach-farm-portfolio.pdf` },
+    { label: "Ummi Saeeda Village Estate Profile", href: `${WEBSITE}/docs/ummi-saeeda-village-estate-profile.pdf` },
+  ];
+  return `
+    <div style="margin:0 0 28px;border:1px solid #e8e8e8;border-radius:4px;padding:20px 24px;">
+      <p style="margin:0 0 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;">Our Portfolios</p>
+      ${docs.map(d => `
+        <a href="${d.href}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#0f2d1a;font-weight:600;font-size:14px;padding:8px 0;">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#f4f9f6;border-radius:3px;color:#2d6a4f;font-size:11px;font-weight:700;">PDF</span>
+          ${d.label}
+        </a>`).join("")}
     </div>`;
 }
