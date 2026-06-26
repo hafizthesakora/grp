@@ -7,11 +7,11 @@ import {
   LayoutDashboard, Users, MessageSquare, FileText, LogOut,
   Shield, ChevronDown, ChevronUp, X, CheckCircle2, Clock,
   Lock, Menu, RefreshCw, UserPlus, Key, Trash2, Eye, EyeOff,
-  ImageIcon, ChevronLeft, ChevronRight as ChevronRightIcon,
+  ImageIcon, ChevronLeft, ChevronRight as ChevronRightIcon, CalendarDays,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
-type Tab = "overview" | "enquiries" | "contacts" | "clients";
+type Tab = "overview" | "enquiries" | "contacts" | "clients" | "registrations";
 
 type Enquiry = {
   _id: string; plotRef: string; firstName: string; lastName: string;
@@ -31,6 +31,12 @@ type Contact = {
 type Client = {
   _id: string; name: string; email: string; role: string; createdAt: string;
   enquiry: Enquiry | null;
+};
+
+type EventReg = {
+  _id: string; firstName: string; lastName: string; email: string;
+  phone: string; country: string; investorType: string; landInterest: string;
+  heardFrom: string; createdAt: string;
 };
 
 const landTypeLabel: Record<string, string> = {
@@ -295,6 +301,7 @@ export default function AdminDashboard() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [registrations, setRegistrations] = useState<EventReg[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [journeyTarget, setJourneyTarget] = useState<Enquiry | null>(null);
@@ -305,14 +312,16 @@ export default function AdminDashboard() {
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
-    const [eq, co, cl] = await Promise.all([
+    const [eq, co, cl, reg] = await Promise.all([
       fetch("/api/admin/enquiries").then(r => r.json()),
       fetch("/api/admin/contacts").then(r => r.json()),
       fetch("/api/admin/clients").then(r => r.json()),
+      fetch("/api/admin/registrations").then(r => r.json()),
     ]);
     setEnquiries(Array.isArray(eq) ? eq : []);
     setContacts(Array.isArray(co) ? co : []);
     setClients(Array.isArray(cl) ? cl : []);
+    setRegistrations(Array.isArray(reg) ? reg : []);
     setLoading(false);
   }, []);
 
@@ -336,6 +345,7 @@ export default function AdminDashboard() {
     { icon: FileText, label: "Enquiries", tab: "enquiries" as Tab, count: enquiries.length },
     { icon: MessageSquare, label: "Contacts", tab: "contacts" as Tab, count: contacts.length },
     { icon: Users, label: "Portal Clients", tab: "clients" as Tab, count: clients.length },
+    { icon: CalendarDays, label: "Webinar Regs", tab: "registrations" as Tab, count: registrations.length },
   ];
 
   return (
@@ -395,7 +405,7 @@ export default function AdminDashboard() {
             </button>
             <div>
               <p className="text-green-950 font-bold text-base leading-tight capitalize">
-                {tab === "overview" ? "Dashboard Overview" : tab === "enquiries" ? "Purchase Enquiries" : tab === "contacts" ? "Contact Messages" : "Portal Clients"}
+                {tab === "overview" ? "Dashboard Overview" : tab === "enquiries" ? "Purchase Enquiries" : tab === "contacts" ? "Contact Messages" : tab === "clients" ? "Portal Clients" : "Webinar Registrations"}
               </p>
               <p className="text-gray-400 text-xs mt-0.5">{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
             </div>
@@ -415,12 +425,13 @@ export default function AdminDashboard() {
               {/* ── OVERVIEW ── */}
               {tab === "overview" && (
                 <div className="max-w-5xl space-y-6">
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     {[
                       { label: "Total Enquiries", value: enquiries.length, color: "text-green-950", bg: "bg-white", icon: FileText },
                       { label: "Contact Messages", value: contacts.length, color: "text-blue-600", bg: "bg-white", icon: MessageSquare },
                       { label: "Portal Clients", value: clients.length, color: "text-[#c9a84c]", bg: "bg-white", icon: Users },
                       { label: "Pending Accounts", value: enquiries.filter(e => !e.hasPortalAccount).length, color: "text-red-500", bg: "bg-white", icon: UserPlus },
+                      { label: "Webinar Registrations", value: registrations.length, color: "text-purple-600", bg: "bg-white", icon: CalendarDays },
                     ].map(s => (
                       <div key={s.label} className={`${s.bg} rounded-xl border border-gray-100 p-5`}>
                         <div className="flex items-center justify-between mb-3">
@@ -584,6 +595,51 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* ── REGISTRATIONS ── */}
+              {tab === "registrations" && (
+                <div className="max-w-6xl space-y-4">
+                  <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+                      <div>
+                        <p className="text-green-950 font-bold text-sm">Beyond Accra — Webinar Registrations</p>
+                        <p className="text-gray-400 text-xs mt-0.5">Sat 25 July 2026 · Virtual · Zoom</p>
+                      </div>
+                      <span className="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+                        {registrations.length} registered
+                      </span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <div className="min-w-[700px]">
+                        <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 grid grid-cols-[2fr_2fr_1.5fr_1fr_1.5fr_1fr] gap-4">
+                          {["Name", "Email", "Country", "Type", "Land Interest", "Date"].map(h => (
+                            <p key={h} className="text-gray-400 text-xs font-bold uppercase tracking-wider">{h}</p>
+                          ))}
+                        </div>
+                        {registrations.length === 0 && (
+                          <p className="px-6 py-12 text-gray-400 text-sm text-center">No registrations yet.</p>
+                        )}
+                        {registrations.map((r, i) => (
+                          <div key={r._id}
+                               className={`grid grid-cols-[2fr_2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center px-6 py-4 ${i < registrations.length - 1 ? "border-b border-gray-50" : ""} hover:bg-gray-50/50 transition-colors`}>
+                            <div className="min-w-0">
+                              <p className="text-green-950 font-semibold text-sm truncate">{r.firstName} {r.lastName}</p>
+                              {r.phone && <p className="text-gray-400 text-xs">{r.phone}</p>}
+                            </div>
+                            <p className="text-gray-500 text-xs truncate">{r.email}</p>
+                            <p className="text-gray-600 text-xs truncate">{r.country}</p>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${r.investorType === "diaspora" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"}`}>
+                              {r.investorType === "diaspora" ? "Diaspora" : "Ghana"}
+                            </span>
+                            <p className="text-gray-500 text-xs truncate">{r.landInterest || "—"}</p>
+                            <p className="text-gray-400 text-xs">{fmt(r.createdAt)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 

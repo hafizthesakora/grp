@@ -205,6 +205,74 @@ export async function sendMail(opts: {
   });
 }
 
+// ── WEBINAR REGISTRATION — internal notification ─────────────────────────────
+export function buildEventRegistrationNotification(data: {
+  firstName: string; lastName: string; email: string; phone?: string;
+  country: string; investorType: string; landInterest?: string; heardFrom?: string;
+}) {
+  const subject = `[Webinar Registration] ${data.firstName} ${data.lastName} — Beyond Accra`;
+  const html = emailBase(`
+    <h2 style="margin:0 0 4px;color:#0f2d1a;font-size:20px;">New Webinar Registration</h2>
+    <p style="margin:0 0 24px;color:#999;font-size:12px;">Beyond Accra — Sat 25 July 2026 · Zoom</p>
+    <table cellpadding="0" cellspacing="0" style="width:100%;">
+      ${row("Name", `${data.firstName} ${data.lastName}`)}
+      ${row("Email", `<a href="mailto:${data.email}" style="color:#2d6a4f;">${data.email}</a>`)}
+      ${data.phone ? row("Phone / WhatsApp", data.phone) : ""}
+      ${row("Country", data.country)}
+      ${row("Investor Type", data.investorType === "diaspora" ? "Diaspora (outside Ghana)" : "Ghana-based")}
+      ${data.landInterest ? row("Land Interest", data.landInterest) : ""}
+      ${data.heardFrom ? row("Heard From", data.heardFrom) : ""}
+    </table>
+    <p style="margin:24px 0 0;font-size:13px;color:#999;">Reply to this email to contact the registrant directly.</p>
+  `);
+  return { subject, html, replyTo: data.email };
+}
+
+// ── WEBINAR REGISTRATION — confirmation to registrant ────────────────────────
+export function buildEventRegistrationConfirmation(firstName: string, email: string) {
+  const subject = `You're registered — Beyond Accra Webinar · 25 July 2026`;
+  const html = emailBase(`
+    <h2 style="margin:0 0 8px;color:#0f2d1a;font-size:22px;">You're registered, ${firstName}.</h2>
+    <p style="margin:0 0 28px;color:#555;font-size:15px;line-height:1.7;">
+      We've confirmed your spot at <strong>Beyond Accra — Where the next wave of Ghanaian land is forming.</strong>
+      A Zoom link and joining instructions will be sent to <strong>${email}</strong> closer to the date.
+    </p>
+
+    <!-- Event details card -->
+    <div style="margin:0 0 28px;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden;">
+      <div style="background:#0f2d1a;padding:14px 20px;">
+        <p style="margin:0;color:#f4c430;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Event Details</p>
+      </div>
+      <table cellpadding="0" cellspacing="0" style="width:100%;padding:0 20px;">
+        ${row("Date", "Saturday, 25 July 2026")}
+        ${row("Time", "To be confirmed — check your inbox")}
+        ${row("Format", "Virtual · Zoom")}
+        ${row("Duration", "90 minutes")}
+        ${row("Host", "Golden Roots Properties")}
+      </table>
+    </div>
+
+    <!-- Agenda -->
+    <div style="margin:0 0 28px;">
+      <p style="margin:0 0 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;">What You'll Learn</p>
+      ${agendaItem("00:05 – 00:20", "The Accra Problem", "Why Accra's land market has peaked for new entrants — pricing, litigation, saturation.")}
+      ${agendaItem("00:20 – 00:45", "The Thesis", "Where the next wave is forming, and the five conditions that almost never converge in one location.")}
+      ${agendaItem("00:45 – 01:00", "The Next Wave", "How Ghanaian land cycles move, and how to read the early signals.")}
+      ${agendaItem("01:00 – 01:15", "How to Buy Without Losing Sleep", "A six-checkpoint verification framework and how to buy safely from abroad.")}
+      ${agendaItem("01:15 – 01:30", "Live Q&A", "Open questions, moderated. Recording shared with all registrants.")}
+    </div>
+
+    ${portfolioLinks()}
+
+    <p style="margin:0 0 8px;color:#555;font-size:14px;">Questions before the webinar?</p>
+    <p style="margin:0;font-size:14px;">
+      <a href="https://wa.me/12482108333" style="color:#2d6a4f;font-weight:700;">WhatsApp: +1 248-210-8333</a> &nbsp;|&nbsp;
+      <a href="mailto:${OFFICIAL_EMAIL}" style="color:#2d6a4f;font-weight:700;">${OFFICIAL_EMAIL}</a>
+    </p>
+  `);
+  return { subject, html };
+}
+
 // ── TEMPLATE HELPERS ─────────────────────────────────────────────────────────
 function row(label: string, value: string) {
   return `
@@ -219,6 +287,17 @@ function step(num: string, text: string) {
     <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
       <div style="min-width:24px;height:24px;background:#f4c430;color:#0f2d1a;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;border-radius:2px;flex-shrink:0;">${num}</div>
       <p style="margin:0;color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;">${text}</p>
+    </div>`;
+}
+
+function agendaItem(time: string, title: string, desc: string) {
+  return `
+    <div style="display:flex;gap:16px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f0f0f0;">
+      <div style="min-width:90px;font-size:10px;color:#aaa;font-weight:700;padding-top:2px;">${time}</div>
+      <div>
+        <p style="margin:0 0 2px;font-size:13px;font-weight:700;color:#0f2d1a;">${title}</p>
+        <p style="margin:0;font-size:12px;color:#777;line-height:1.5;">${desc}</p>
+      </div>
     </div>`;
 }
 

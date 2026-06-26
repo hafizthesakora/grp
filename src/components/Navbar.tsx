@@ -20,6 +20,7 @@ const navLinks = [
   { label: "About", href: "/about" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
+  { label: "Events", href: "/events", highlight: true },
 ];
 
 export default function Navbar() {
@@ -100,16 +101,23 @@ export default function Navbar() {
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-7">
             {navLinks.map((l) => (
-              <Link key={l.href} href={l.href}
-                className={`font-semibold text-[14px] tracking-wide transition-all relative ${
-                  pathname === l.href ? "text-gold-400" : "text-white/80 hover:text-white"
-                }`}
-              >
-                {l.label}
-                {pathname === l.href && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gold-400 rounded-full" />
-                )}
-              </Link>
+              l.highlight && pathname !== l.href ? (
+                <Link key={l.href} href={l.href}
+                  className="font-bold text-[13px] tracking-wide bg-gold-400/10 border border-gold-400/30 text-gold-400 hover:bg-gold-400/20 px-3 py-1 transition-all">
+                  {l.label}
+                </Link>
+              ) : (
+                <Link key={l.href} href={l.href}
+                  className={`font-semibold text-[14px] tracking-wide transition-all relative ${
+                    pathname === l.href ? "text-gold-400" : "text-white/80 hover:text-white"
+                  }`}
+                >
+                  {l.label}
+                  {pathname === l.href && (
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gold-400 rounded-full" />
+                  )}
+                </Link>
+              )
             ))}
           </nav>
 
