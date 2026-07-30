@@ -38,7 +38,7 @@ const emailBase = (body: string) => `
             <img src="${WEBSITE}/logo.png" width="56" height="56" alt="${COMPANY}"
                  style="display:block;margin:0 auto 12px;border-radius:8px;" />
             <p style="margin:0;color:#f4c430;font-size:20px;font-weight:700;letter-spacing:1px;">${COMPANY}</p>
-            <p style="margin:6px 0 0;color:rgba(255,255,255,0.5);font-size:11px;letter-spacing:2px;text-transform:uppercase;">Secure Land in Ghana</p>
+            <p style="margin:6px 0 0;color:rgba(255,255,255,0.5);font-size:11px;letter-spacing:2px;text-transform:uppercase;">Reconnect · Rebuild · Return</p>
           </td>
         </tr>
         <!-- Body -->

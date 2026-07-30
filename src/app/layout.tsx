@@ -9,7 +9,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Golden Roots Properties | Secure Land in Ghana",
+  title: "Golden Roots Properties | Reconnect. Rebuild. Return.",
   description:
     "Litigation-free land investment in Ghana's Central Region. Built for the African diaspora. Transparent, verified, and fully supported from enquiry to ownership.",
   keywords:

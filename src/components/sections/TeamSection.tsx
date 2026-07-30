@@ -14,12 +14,6 @@ const team = [
     photo: "/team/mercy.jpg",
   },
   {
-    name: "Prudence Borbin",
-    role: "Head of Diaspora Relations",
-    bio: "Dedicated to building lasting relationships with diaspora clients across North America, Europe, and beyond.",
-    photo: "/team/prudence.jpg",
-  },
-  {
     name: "Hafiz Toyyib",
     role: "Chief Innovation Officer",
     bio: "Leading the technology and innovation strategy that powers Golden Roots' modern approach to land ownership.",
@@ -48,7 +42,7 @@ export default function TeamSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {team.map((member) => (
             <div key={member.name} className="group border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-black/5 transition-shadow duration-300">
               {/* Photo */}
