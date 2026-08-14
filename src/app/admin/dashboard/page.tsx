@@ -34,10 +34,13 @@ type Client = {
 };
 
 type EventReg = {
-  _id: string; firstName: string; lastName: string; email: string;
+  _id: string; eventSlug: string; firstName: string; lastName: string; email: string;
   phone: string; country: string; investorType: string; landInterest: string;
+  comingFrom: string; attendingAs: string; guests: number;
   heardFrom: string; createdAt: string;
 };
+
+const FESTIVAL_SLUG = "roots-festival-2026";
 
 const landTypeLabel: Record<string, string> = {
   residential: "Residential", agro: "Agro-Industrial", beach: "Beach", offmarket: "Off-Market",
@@ -345,7 +348,7 @@ export default function AdminDashboard() {
     { icon: FileText, label: "Enquiries", tab: "enquiries" as Tab, count: enquiries.length },
     { icon: MessageSquare, label: "Contacts", tab: "contacts" as Tab, count: contacts.length },
     { icon: Users, label: "Portal Clients", tab: "clients" as Tab, count: clients.length },
-    { icon: CalendarDays, label: "Webinar Regs", tab: "registrations" as Tab, count: registrations.length },
+    { icon: CalendarDays, label: "Event Regs", tab: "registrations" as Tab, count: registrations.length },
   ];
 
   return (
@@ -405,7 +408,7 @@ export default function AdminDashboard() {
             </button>
             <div>
               <p className="text-green-950 font-bold text-base leading-tight capitalize">
-                {tab === "overview" ? "Dashboard Overview" : tab === "enquiries" ? "Purchase Enquiries" : tab === "contacts" ? "Contact Messages" : tab === "clients" ? "Portal Clients" : "Webinar Registrations"}
+                {tab === "overview" ? "Dashboard Overview" : tab === "enquiries" ? "Purchase Enquiries" : tab === "contacts" ? "Contact Messages" : tab === "clients" ? "Portal Clients" : "Event Registrations"}
               </p>
               <p className="text-gray-400 text-xs mt-0.5">{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
             </div>
@@ -431,7 +434,7 @@ export default function AdminDashboard() {
                       { label: "Contact Messages", value: contacts.length, color: "text-blue-600", bg: "bg-white", icon: MessageSquare },
                       { label: "Portal Clients", value: clients.length, color: "text-[#c9a84c]", bg: "bg-white", icon: Users },
                       { label: "Pending Accounts", value: enquiries.filter(e => !e.hasPortalAccount).length, color: "text-red-500", bg: "bg-white", icon: UserPlus },
-                      { label: "Webinar Registrations", value: registrations.length, color: "text-purple-600", bg: "bg-white", icon: CalendarDays },
+                      { label: "Event Registrations", value: registrations.length, color: "text-purple-600", bg: "bg-white", icon: CalendarDays },
                     ].map(s => (
                       <div key={s.label} className={`${s.bg} rounded-xl border border-gray-100 p-5`}>
                         <div className="flex items-center justify-between mb-3">
@@ -599,49 +602,104 @@ export default function AdminDashboard() {
               )}
 
               {/* ── REGISTRATIONS ── */}
-              {tab === "registrations" && (
-                <div className="max-w-6xl space-y-4">
-                  <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                      <div>
-                        <p className="text-green-950 font-bold text-sm">Beyond Accra — Webinar Registrations</p>
-                        <p className="text-gray-400 text-xs mt-0.5">Sat 25 July 2026 · Virtual · Zoom</p>
+              {tab === "registrations" && (() => {
+                const festival = registrations.filter(r => r.eventSlug === FESTIVAL_SLUG);
+                const webinar = registrations.filter(r => r.eventSlug !== FESTIVAL_SLUG);
+                // Each festival sign-up can cover a group, so the headline number
+                // the venue cares about is total heads, not total registrations.
+                const heads = festival.reduce((sum, r) => sum + (r.guests || 1), 0);
+
+                return (
+                  <div className="max-w-6xl space-y-6">
+                    {/* Roots Festival */}
+                    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                      <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-green-950 font-bold text-sm">The Roots Festival — Registrations</p>
+                          <p className="text-gray-400 text-xs mt-0.5">Sun 30 Aug 2026 · Farra Event Center, Mankessim</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+                            {festival.length} registered
+                          </span>
+                          <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
+                            {heads} attending
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
-                        {registrations.length} registered
-                      </span>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <div className="min-w-[700px]">
-                        <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 grid grid-cols-[2fr_2fr_1.5fr_1fr_1.5fr_1fr] gap-4">
-                          {["Name", "Email", "Country", "Type", "Land Interest", "Date"].map(h => (
-                            <p key={h} className="text-gray-400 text-xs font-bold uppercase tracking-wider">{h}</p>
+                      <div className="overflow-x-auto">
+                        <div className="min-w-[700px]">
+                          <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 grid grid-cols-[2fr_2fr_1.5fr_1fr_1fr_1fr] gap-4">
+                            {["Name", "Email", "Coming From", "Attending As", "Guests", "Date"].map(h => (
+                              <p key={h} className="text-gray-400 text-xs font-bold uppercase tracking-wider">{h}</p>
+                            ))}
+                          </div>
+                          {festival.length === 0 && (
+                            <p className="px-6 py-12 text-gray-400 text-sm text-center">No festival registrations yet.</p>
+                          )}
+                          {festival.map((r, i) => (
+                            <div key={r._id}
+                                 className={`grid grid-cols-[2fr_2fr_1.5fr_1fr_1fr_1fr] gap-4 items-center px-6 py-4 ${i < festival.length - 1 ? "border-b border-gray-50" : ""} hover:bg-gray-50/50 transition-colors`}>
+                              <div className="min-w-0">
+                                <p className="text-green-950 font-semibold text-sm truncate">{r.firstName} {r.lastName}</p>
+                                {r.phone && <p className="text-gray-400 text-xs">{r.phone}</p>}
+                              </div>
+                              <p className="text-gray-500 text-xs truncate">{r.email}</p>
+                              <p className="text-gray-600 text-xs truncate">{r.comingFrom || "—"}</p>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit capitalize ${r.attendingAs === "guest" ? "bg-gray-100 text-gray-600" : "bg-purple-100 text-purple-700"}`}>
+                                {r.attendingAs || "guest"}
+                              </span>
+                              <p className="text-gray-600 text-xs font-semibold">{r.guests || 1}</p>
+                              <p className="text-gray-400 text-xs">{fmt(r.createdAt)}</p>
+                            </div>
                           ))}
                         </div>
-                        {registrations.length === 0 && (
-                          <p className="px-6 py-12 text-gray-400 text-sm text-center">No registrations yet.</p>
-                        )}
-                        {registrations.map((r, i) => (
-                          <div key={r._id}
-                               className={`grid grid-cols-[2fr_2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center px-6 py-4 ${i < registrations.length - 1 ? "border-b border-gray-50" : ""} hover:bg-gray-50/50 transition-colors`}>
-                            <div className="min-w-0">
-                              <p className="text-green-950 font-semibold text-sm truncate">{r.firstName} {r.lastName}</p>
-                              {r.phone && <p className="text-gray-400 text-xs">{r.phone}</p>}
-                            </div>
-                            <p className="text-gray-500 text-xs truncate">{r.email}</p>
-                            <p className="text-gray-600 text-xs truncate">{r.country}</p>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${r.investorType === "diaspora" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"}`}>
-                              {r.investorType === "diaspora" ? "Diaspora" : "Ghana"}
-                            </span>
-                            <p className="text-gray-500 text-xs truncate">{r.landInterest || "—"}</p>
-                            <p className="text-gray-400 text-xs">{fmt(r.createdAt)}</p>
+                      </div>
+                    </div>
+
+                    {/* Beyond Accra webinar */}
+                    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                      <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+                        <div>
+                          <p className="text-green-950 font-bold text-sm">Beyond Accra — Webinar Registrations</p>
+                          <p className="text-gray-400 text-xs mt-0.5">Sat 25 July 2026 · Virtual · Zoom</p>
+                        </div>
+                        <span className="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+                          {webinar.length} registered
+                        </span>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <div className="min-w-[700px]">
+                          <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 grid grid-cols-[2fr_2fr_1.5fr_1fr_1.5fr_1fr] gap-4">
+                            {["Name", "Email", "Country", "Type", "Land Interest", "Date"].map(h => (
+                              <p key={h} className="text-gray-400 text-xs font-bold uppercase tracking-wider">{h}</p>
+                            ))}
                           </div>
-                        ))}
+                          {webinar.length === 0 && (
+                            <p className="px-6 py-12 text-gray-400 text-sm text-center">No registrations yet.</p>
+                          )}
+                          {webinar.map((r, i) => (
+                            <div key={r._id}
+                                 className={`grid grid-cols-[2fr_2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center px-6 py-4 ${i < webinar.length - 1 ? "border-b border-gray-50" : ""} hover:bg-gray-50/50 transition-colors`}>
+                              <div className="min-w-0">
+                                <p className="text-green-950 font-semibold text-sm truncate">{r.firstName} {r.lastName}</p>
+                                {r.phone && <p className="text-gray-400 text-xs">{r.phone}</p>}
+                              </div>
+                              <p className="text-gray-500 text-xs truncate">{r.email}</p>
+                              <p className="text-gray-600 text-xs truncate">{r.country}</p>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${r.investorType === "diaspora" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"}`}>
+                                {r.investorType === "diaspora" ? "Diaspora" : "Ghana"}
+                              </span>
+                              <p className="text-gray-500 text-xs truncate">{r.landInterest || "—"}</p>
+                              <p className="text-gray-400 text-xs">{fmt(r.createdAt)}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* ── CLIENTS ── */}
               {tab === "clients" && (

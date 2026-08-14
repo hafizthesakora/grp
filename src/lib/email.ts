@@ -273,6 +273,79 @@ export function buildEventRegistrationConfirmation(firstName: string, email: str
   return { subject, html };
 }
 
+// ── ROOTS FESTIVAL — internal notification ───────────────────────────────────
+export function buildFestivalRegistrationNotification(data: {
+  firstName: string; lastName: string; email: string; phone?: string;
+  comingFrom: string; attendingAs: string; guests: number; heardFrom?: string;
+}) {
+  const subject = `[Roots Festival] ${data.firstName} ${data.lastName} — ${data.guests} ${data.guests === 1 ? "guest" : "guests"}`;
+  const html = emailBase(`
+    <h2 style="margin:0 0 4px;color:#0f2d1a;font-size:20px;">New Roots Festival Registration</h2>
+    <p style="margin:0 0 24px;color:#999;font-size:12px;">Sunday 30 August 2026 · 11:00 AM · Farra Event Center, Mankessim</p>
+    <table cellpadding="0" cellspacing="0" style="width:100%;">
+      ${row("Name", `${data.firstName} ${data.lastName}`)}
+      ${row("Email", `<a href="mailto:${data.email}" style="color:#2d6a4f;">${data.email}</a>`)}
+      ${data.phone ? row("Phone / WhatsApp", data.phone) : ""}
+      ${row("Coming From", data.comingFrom)}
+      ${row("Attending As", ATTENDING_LABEL[data.attendingAs] ?? data.attendingAs)}
+      ${row("Total Attending", `${data.guests} ${data.guests === 1 ? "person" : "people"}`)}
+      ${data.heardFrom ? row("Heard From", data.heardFrom) : ""}
+    </table>
+    <p style="margin:24px 0 0;font-size:13px;color:#999;">Reply to this email to contact the registrant directly.</p>
+  `);
+  return { subject, html, replyTo: data.email };
+}
+
+// ── ROOTS FESTIVAL — confirmation to registrant ──────────────────────────────
+export function buildFestivalRegistrationConfirmation(firstName: string, guests: number, attendingAs: string) {
+  const subject = `You're on the list — The Roots Festival · 30 August 2026`;
+  const html = emailBase(`
+    <h2 style="margin:0 0 8px;color:#0f2d1a;font-size:22px;">See you at the festival, ${firstName}.</h2>
+    <p style="margin:0 0 28px;color:#555;font-size:15px;line-height:1.7;">
+      Your spot at <strong>The Roots Festival — Where Community Takes Root</strong> is confirmed for
+      <strong>${guests} ${guests === 1 ? "person" : "people"}</strong>${attendingAs && attendingAs !== "guest" ? ` (registered as ${ATTENDING_LABEL[attendingAs] ?? attendingAs})` : ""}.
+      Entry is free — simply give your name at the gate on the day.
+    </p>
+
+    <!-- Event details card -->
+    <div style="margin:0 0 28px;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden;">
+      <div style="background:#0f2d1a;padding:14px 20px;">
+        <p style="margin:0;color:#f4c430;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Event Details</p>
+      </div>
+      <table cellpadding="0" cellspacing="0" style="width:100%;padding:0 20px;">
+        ${row("Date", "Sunday, 30 August 2026")}
+        ${row("Time", "From 11:00 AM")}
+        ${row("Venue", "Farra Event Center, Mankessim")}
+        ${row("Entry", "Free · All are welcome")}
+        ${row("Host", "Golden Roots Properties")}
+      </table>
+    </div>
+
+    <!-- What's happening -->
+    <div style="margin:0 0 28px;">
+      <p style="margin:0 0 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;">What's Happening</p>
+      ${agendaItem("Meet", "Vendors & Exhibitors", "Local businesses, agriculture, crafts and real estate under one roof.")}
+      ${agendaItem("Share", "Culture", "Music, food and the traditions that make the Central Region what it is.")}
+      ${agendaItem("Connect", "Community", "Meet the Golden Roots team and fellow landowners — at home and from the diaspora.")}
+    </div>
+
+    ${portfolioLinks()}
+
+    <p style="margin:0 0 8px;color:#555;font-size:14px;">Questions, or bringing a larger group?</p>
+    <p style="margin:0;font-size:14px;">
+      <a href="https://wa.me/233540839298" style="color:#2d6a4f;font-weight:700;">WhatsApp: +233 54-083-9298</a> &nbsp;|&nbsp;
+      <a href="mailto:${OFFICIAL_EMAIL}" style="color:#2d6a4f;font-weight:700;">${OFFICIAL_EMAIL}</a>
+    </p>
+  `);
+  return { subject, html };
+}
+
+const ATTENDING_LABEL: Record<string, string> = {
+  guest: "Guest",
+  vendor: "Vendor",
+  exhibitor: "Exhibitor",
+};
+
 // ── TEMPLATE HELPERS ─────────────────────────────────────────────────────────
 function row(label: string, value: string) {
   return `

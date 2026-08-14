@@ -5,32 +5,60 @@ import {
   sendMail,
   buildEventRegistrationNotification,
   buildEventRegistrationConfirmation,
+  buildFestivalRegistrationNotification,
+  buildFestivalRegistrationConfirmation,
   OFFICIAL_EMAIL,
 } from "@/lib/email";
+
+const FESTIVAL = "roots-festival-2026";
+const WEBINAR = "beyond-accra-2026";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { firstName, lastName, email, phone, country, investorType, landInterest, heardFrom } = body;
+    const {
+      firstName, lastName, email, phone, country, investorType, landInterest,
+      comingFrom, attendingAs, guests, heardFrom,
+    } = body;
 
-    if (!firstName || !lastName || !email || !country || !investorType) {
+    const eventSlug = body.eventSlug === FESTIVAL ? FESTIVAL : WEBINAR;
+    const isFestival = eventSlug === FESTIVAL;
+
+    // Shared requirements, then the fields that only matter for one event.
+    if (!firstName || !lastName || !email) {
+      return Response.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    if (isFestival && (!phone || !comingFrom || !attendingAs)) {
+      return Response.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    if (!isFestival && (!country || !investorType)) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     await connectDB();
 
-    const existing = await EventRegistration.findOne({ email: email.toLowerCase(), eventSlug: "beyond-accra-2026" });
+    const existing = await EventRegistration.findOne({ email: email.toLowerCase(), eventSlug });
     if (existing) {
       return Response.json({ error: "already_registered" }, { status: 409 });
     }
 
+    const guestCount = Math.min(Math.max(parseInt(String(guests), 10) || 1, 1), 50);
+
     const registration = await EventRegistration.create({
-      eventSlug: "beyond-accra-2026",
-      firstName, lastName, email, phone, country, investorType, landInterest, heardFrom,
+      eventSlug,
+      firstName, lastName, email, phone, heardFrom,
+      ...(isFestival
+        ? { comingFrom, attendingAs, guests: guestCount }
+        : { country, investorType, landInterest }),
     });
 
-    const notification = buildEventRegistrationNotification({ firstName, lastName, email, phone, country, investorType, landInterest, heardFrom });
-    const confirmation = buildEventRegistrationConfirmation(firstName, email);
+    const notification = isFestival
+      ? buildFestivalRegistrationNotification({ firstName, lastName, email, phone, comingFrom, attendingAs, guests: guestCount, heardFrom })
+      : buildEventRegistrationNotification({ firstName, lastName, email, phone, country, investorType, landInterest, heardFrom });
+
+    const confirmation = isFestival
+      ? buildFestivalRegistrationConfirmation(firstName, guestCount, attendingAs)
+      : buildEventRegistrationConfirmation(firstName, email);
 
     await Promise.allSettled([
       sendMail({ to: OFFICIAL_EMAIL, fromName: `${firstName} ${lastName}`, ...notification }),
